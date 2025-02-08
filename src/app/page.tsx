@@ -1,3 +1,5 @@
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route"; // Import your auth options
 import { User } from "@/types/User";
 
 async function getUsers(): Promise<User[]> {
@@ -11,18 +13,34 @@ async function getUsers(): Promise<User[]> {
 }
 
 export default async function Home() {
-  const users = await getUsers(); // Server-side fetch
+  const session = await getServerSession(authOptions); // Get session data
+  const users = await getUsers(); // Fetch users
 
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
       <h1 className="text-xl font-bold">Welcome to Next.js</h1>
 
+      {/* Display session info */}
+      <div className="p-4 border rounded-lg bg-gray-100 w-full max-w-lg text-center">
+        {session ? (
+          <>
+            <p className="font-semibold">Logged in as:</p>
+            <p>
+              {session.user?.name} ({session.user?.email})
+            </p>
+          </>
+        ) : (
+          <p className="text-red-500">Not logged in</p>
+        )}
+      </div>
+
+      {/* User List */}
       <div className="w-full max-w-lg">
         <h2 className="text-lg font-semibold">User List</h2>
         <ul className="mt-4 space-y-2">
           {users.map((user) => (
             <li key={user._id} className="p-2 border rounded-lg">
-              {user.name} - {user.email}
+              {user.name} - {user.email} - {user.isAdmin ? "Admin" : "User"}
             </li>
           ))}
         </ul>

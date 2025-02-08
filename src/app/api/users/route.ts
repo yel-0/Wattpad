@@ -4,7 +4,7 @@ import { connectToDatabase } from "@/lib/mongodb";
 export async function GET() {
   try {
     await connectToDatabase();
-    const users = await User.find().select("-password"); // Exclude passwords
+    const users = await User.find().select("-password");
 
     return NextResponse.json(users, { status: 200 });
   } catch (error) {
