@@ -3,6 +3,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { BookCarousel } from "./components/User/BookCarousel";
 import ImageCarousel from "./components/User/ImageCarousel";
 import StoryCard from "./components/User/StoryCard";
+import { StoryCarousel } from "./components/User/StoryCarousel";
 
 const books = [
   {
@@ -47,11 +48,46 @@ const books = [
   },
 ];
 
+const stories = [
+  {
+    imageUrl: "https://img.wattpad.com/cover/94569890-256-k537385.jpg",
+    title: "Only You",
+    altText: "Only You Cover",
+    reads: "7.4M",
+    description:
+      "Charlotte agrees to fake date bad boy Mason to make her best friend jealous. But as lines blur, feelings change, and rules are broken. What starts as a harmless arrangement quickly escalates, and Charlotte finds herself falling for Mason, despite all the reasons she shouldn't. As their fake relationship becomes more complicated, Charlotte must navigate her growing feelings and the pressure of keeping up the lie.",
+  },
+  {
+    imageUrl: "https://img.wattpad.com/cover/94569890-256-k537385.jpg",
+    title: "The Last Night",
+    altText: "The Last Night Cover",
+    reads: "3.2M",
+    description:
+      "A mysterious stranger appears in town, changing everything. His arrival brings secrets to light, unraveling the quiet life of the town and introducing dangerous new dynamics. As the night unfolds, alliances are tested, and hidden truths are revealed, leading to a series of events that no one could have predicted. Will the stranger’s presence be a blessing or a curse for those involved?",
+  },
+  {
+    imageUrl: "https://img.wattpad.com/cover/94569890-256-k537385.jpg",
+    title: "Only You",
+    altText: "Only You Cover",
+    reads: "7.4M",
+    description:
+      "Charlotte agrees to fake date bad boy Mason to make her best friend jealous. However, as their fake romance progresses, Charlotte begins to see another side of Mason—one that makes her question everything she thought she knew about him. The line between fake and real becomes increasingly hard to distinguish, and Charlotte must decide whether she is still in control of the situation or if her feelings are now in charge.",
+  },
+  {
+    imageUrl: "https://img.wattpad.com/cover/94569890-256-k537385.jpg",
+    title: "The Last Night",
+    altText: "The Last Night Cover",
+    reads: "3.2M",
+    description:
+      "A mysterious stranger appears in town, changing everything. As tensions rise, the town's calm facade starts to crack, revealing dark secrets buried deep within. With every passing hour, the stranger’s true motives come into question, and the town must come together to confront the truth—before it's too late. Can anyone trust the stranger, or has their arrival set in motion a series of irreversible events?",
+  },
+];
+
 export default async function Home() {
   const session = await getServerSession(authOptions);
 
   return (
-    <main className="container mx-auto px-20 mt-5">
+    <main className="container mx-auto px-4 md:px-10 lg:px-20 mt-5">
       <ImageCarousel />
       <div className="text-lg my-6 sm:text-xl font-semibold text-black">
         Featured Books
@@ -65,10 +101,30 @@ export default async function Home() {
         Love at first sentence 📖💘
       </div>
       <BookCarousel books={books} />
-      <div className="w-full flex flex-col justify-between gap-4 md:flex-row py-4">
-        <StoryCard />
-        <StoryCard />
+
+      <div className="text-sm mt-6  text-black opacity-75">
+        Fall head over heels
       </div>
+      <div className="text-lg sm:text-xl mb-5 font-semibold text-black">
+        Love at first sentence 📖💘
+      </div>
+      <StoryCarousel stories={stories} />
+
+      <div className="text-sm mt-6  text-black opacity-75">
+        Fall head over heels
+      </div>
+      <div className="text-lg sm:text-xl font-semibold text-black">
+        Love at first sentence 📖💘
+      </div>
+      <BookCarousel books={books} />
+
+      <div className="text-sm mt-6  text-black opacity-75">
+        Fall head over heels
+      </div>
+      <div className="text-lg sm:text-xl font-semibold text-black">
+        Love at first sentence 📖💘
+      </div>
+      <BookCarousel books={books} />
     </main>
   );
 }
