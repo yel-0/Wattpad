@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { BookCarousel } from "./components/User/BookCarousel";
 import ImageCarousel from "./components/User/ImageCarousel";
+import StoryCard from "./components/User/StoryCard";
 
 const books = [
   {
@@ -50,12 +51,24 @@ export default async function Home() {
   const session = await getServerSession(authOptions);
 
   return (
-    <main className="container mx-auto p-4">
+    <main className="container mx-auto px-20 mt-5">
       <ImageCarousel />
-      <div className="text-lg my-2 sm:text-xl font-semibold text-black">
+      <div className="text-lg my-6 sm:text-xl font-semibold text-black">
         Featured Books
       </div>
       <BookCarousel books={books} />
+
+      <div className="text-sm mt-6  text-black opacity-75">
+        Fall head over heels
+      </div>
+      <div className="text-lg sm:text-xl font-semibold text-black">
+        Love at first sentence 📖💘
+      </div>
+      <BookCarousel books={books} />
+      <div className="w-full flex flex-col justify-between gap-4 md:flex-row py-4">
+        <StoryCard />
+        <StoryCard />
+      </div>
     </main>
   );
 }
