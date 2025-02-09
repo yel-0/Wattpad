@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"; // Import your auth options
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { User } from "@/types/User";
 
 async function getUsers(): Promise<User[]> {
@@ -15,6 +15,7 @@ async function getUsers(): Promise<User[]> {
 export default async function Home() {
   const session = await getServerSession(authOptions); // Get session data
   const users = await getUsers(); // Fetch users
+  console.log(session);
 
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
@@ -26,7 +27,8 @@ export default async function Home() {
           <>
             <p className="font-semibold">Logged in as:</p>
             <p>
-              {session.user?.name} ({session.user?.email})
+              {session.user?.name} ({session.user?.email}):(
+              {session.user?.isAdmin ? "admin" : "user"})
             </p>
           </>
         ) : (
