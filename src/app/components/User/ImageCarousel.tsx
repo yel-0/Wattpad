@@ -30,7 +30,7 @@ const ImageCarousel = () => {
               alt="Image 1"
               layout="responsive"
               width={1200} // Adjust the width for image scaling
-              height={800} // Adjust the height based on the aspect ratio
+              height={340} // Adjust the height based on the aspect ratio
               className="rounded-lg shadow-lg"
             />
           </CarouselItem>
@@ -48,7 +48,7 @@ const ImageCarousel = () => {
               alt="Image 2"
               layout="responsive"
               width={1200}
-              height={800}
+              height={340}
               className="rounded-lg shadow-lg"
             />
           </CarouselItem>
@@ -66,7 +66,7 @@ const ImageCarousel = () => {
               alt="Image 3"
               layout="responsive"
               width={1200}
-              height={800}
+              height={340}
               className="rounded-lg shadow-lg"
             />
           </CarouselItem>

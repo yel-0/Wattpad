@@ -140,8 +140,8 @@ const Navbar = ({
     { name: "Sitemap", url: "#" },
   ],
   auth = {
-    login: { text: "Log in", url: "#" },
-    signup: { text: "Sign up", url: "#" },
+    login: { text: "Log in", url: "/login" },
+    signup: { text: "Sign up", url: "/register" },
   },
 }: Navbar1Props) => {
   return (
