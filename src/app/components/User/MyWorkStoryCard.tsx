@@ -1,6 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   Eye,
   MessageSquare,
   Star,
@@ -54,12 +60,28 @@ const MyWorkStoryCard = () => {
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row sm:gap-2 gap-2 sm:mt-0 mt-4 w-full sm:w-auto">
-          <Button
-            size="sm"
-            className="flex items-center gap-1 w-full sm:w-auto bg-orange-500 hover:bg-orange-600"
-          >
-            Continue Writing <ChevronDown size={14} />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger className="flex items-center p-4 h-7 border-none outline-none gap-1 w-full text-white sm:w-auto bg-orange-500 hover:bg-orange-600 rounded-md">
+              <div className="text-sm">Continue Writing</div>{" "}
+              <ChevronDown size={14} />
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent className="w-80 p-2">
+              {/* Example Items */}
+              <DropdownMenuItem className="flex items-center gap-2">
+                <span>Chapter 1</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="flex items-center gap-2">
+                <span>Chapter 2</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="flex items-center gap-2">
+                <span>Chapter 3</span>
+              </DropdownMenuItem>
+              <Button className="mt-3 w-full bg-orange-500 hover:bg-orange-600">
+                New
+              </Button>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Button
             variant="outline"
             size="sm"
