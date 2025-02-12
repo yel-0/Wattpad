@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Mail, Briefcase, BookOpen, Users, Settings } from "lucide-react";
 import Link from "next/link";
 import { Facebook, Twitter } from "lucide-react";
+import FollowUserCard from "@/app/components/Share/FollowUserCard";
 
 const stories = [
   {
@@ -189,7 +190,7 @@ const UserProfile = () => {
                 <Settings />
               </Button>
             </div>
-            {stories.map((story, index) => (
+            {/* {stories.map((story, index) => (
               <SearchStoryCard
                 key={index}
                 cover={story.cover}
@@ -201,9 +202,13 @@ const UserProfile = () => {
                 time={story.time}
                 isComplete={story.isComplete}
               />
-            ))}
+            ))} */}
           </div>
         </div>
+      </div>
+
+      <div className="flex flex-row justify-center items-center">
+        <FollowUserCard />
       </div>
     </div>
   );
