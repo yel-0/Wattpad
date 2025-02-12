@@ -48,7 +48,7 @@ export function ChapterSelect() {
         <img
           src="https://img.wattpad.com/cover/765329-64-k688944.jpg"
           alt="Book cover"
-          className="w-8 h-8 object-cover rounded"
+          className="w-8 h-10 object-cover rounded"
         />
         <div className="text-left">
           <h2 className="text-sm font-semibold">

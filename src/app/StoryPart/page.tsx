@@ -67,7 +67,7 @@ export default function StoryReader() {
           </div>
 
           {/* Story Text */}
-          <div className="prose max-w-none p-6 text-gray-800 leading-relaxed">
+          <div className="prose max-w-none  text-gray-800 leading-relaxed">
             <p className="mb-4">
               The phone rang at exactly 11:37 PM, as it had every night for the
               past two weeks. Amelia had been avoiding it, watching it ring from
