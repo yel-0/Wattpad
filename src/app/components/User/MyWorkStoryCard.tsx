@@ -77,9 +77,11 @@ const MyWorkStoryCard = () => {
               <DropdownMenuItem className="flex items-center gap-2">
                 <span>Chapter 3</span>
               </DropdownMenuItem>
-              <Button className="mt-3 w-full bg-orange-500 hover:bg-orange-600">
-                New
-              </Button>
+              <Link href="/CreateStoryPart">
+                <Button className="mt-3 w-full bg-orange-500 hover:bg-orange-600">
+                  New
+                </Button>
+              </Link>
             </DropdownMenuContent>
           </DropdownMenu>
           <Button

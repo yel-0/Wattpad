@@ -70,7 +70,7 @@ const Navbar = ({
     title: "Wattpad",
   },
   menu = [
-    { title: "Home", url: "#" },
+    { title: "Home", url: "/" },
     {
       title: "Browse",
       url: "#",
@@ -130,7 +130,7 @@ const Navbar = ({
         {
           title: "Terms of Service",
           description: "Review the terms and conditions for using our platform",
-          url: "#",
+          url: "/TermsAndConditions",
         },
       ],
     },

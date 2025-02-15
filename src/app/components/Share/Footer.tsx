@@ -11,34 +11,22 @@ import Link from "next/link";
 
 const footerLinks = [
   {
-    title: "Overview",
-    href: "#",
-  },
-  {
-    title: "Features",
-    href: "#",
-  },
-  {
-    title: "Pricing",
-    href: "#",
-  },
-  {
-    title: "Careers",
-    href: "#",
-  },
-  {
     title: "Help",
-    href: "#",
+    href: "/Faq",
   },
   {
-    title: "Privacy",
-    href: "#",
+    title: "Contact",
+    href: "/Contact",
+  },
+  {
+    title: "Terms And Conditions",
+    href: "/TermsAndConditions",
   },
 ];
 
 const Footer = () => {
   return (
-    <div className="bg-gray-50 flex flex-col">
+    <div className="bg-gray-50 mt-10 flex flex-col">
       <div className="grow bg-muted" />
       <footer>
         <div className="max-w-screen-xl mx-auto">
@@ -90,7 +78,7 @@ const Footer = () => {
             <span className="text-muted-foreground">
               &copy; {new Date().getFullYear()}{" "}
               <Link href="/" target="_blank">
-                Shadcn UI Blocks
+                Wattpad
               </Link>
               . All rights reserved.
             </span>
