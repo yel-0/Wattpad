@@ -15,6 +15,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { LogOut, Settings, User } from "lucide-react";
 import { WriteDropdown } from "./WriteDropdown";
+import Link from "next/link";
 
 const AuthUser = () => {
   const { data: session } = useSession();
@@ -58,10 +59,12 @@ const AuthUser = () => {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <User className="mr-2 h-4 w-4" />
-                <span>Profile</span>
-              </DropdownMenuItem>
+              <Link href={"/Profile"}>
+                <DropdownMenuItem>
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Profile</span>
+                </DropdownMenuItem>
+              </Link>
               <DropdownMenuItem>
                 <Settings className="mr-2 h-4 w-4" />
                 <span>Settings</span>
