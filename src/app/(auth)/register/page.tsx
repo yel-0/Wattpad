@@ -8,16 +8,52 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import RegisterImage from "../../../../public/Login.jpg";
+import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
-  const [message, setMessage] = useState("");
+  const { toast } = useToast();
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
+    setLoading(true);
 
-    const result = await registerUser(formData);
-    setMessage(result.message);
+    const form = new FormData();
+    form.append("name", formData.name);
+    form.append("email", formData.email);
+    form.append("password", formData.password);
+
+    const result = await registerUser(form);
+    setLoading(false);
+
+    if (!result.success) {
+      toast({
+        title: "Registration Failed",
+        description: result.message,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Success!",
+      description: "Your account has been created. Redirecting...",
+    });
+
+    setTimeout(() => {
+      router.push("/login");
+    }, 1500);
   };
 
   return (
@@ -36,11 +72,10 @@ export default function RegisterPage() {
             <form onSubmit={handleSubmit} className="flex flex-col gap-6">
               <div className="flex flex-col items-center gap-2 text-center">
                 <h1 className="text-2xl font-bold">Create an Account</h1>
-                <p className="text-balance text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   Enter your details below to create an account
                 </p>
               </div>
-              {message && <p className="text-red-500 text-center">{message}</p>}
 
               <div className="grid gap-6">
                 <div className="grid gap-2">
@@ -50,6 +85,8 @@ export default function RegisterPage() {
                     type="text"
                     name="name"
                     placeholder="John Doe"
+                    value={formData.name}
+                    onChange={handleChange}
                     required
                   />
                 </div>
@@ -60,6 +97,8 @@ export default function RegisterPage() {
                     type="email"
                     name="email"
                     placeholder="example@email.com"
+                    value={formData.email}
+                    onChange={handleChange}
                     required
                   />
                 </div>
@@ -70,14 +109,17 @@ export default function RegisterPage() {
                     type="password"
                     name="password"
                     placeholder="••••••••"
+                    value={formData.password}
+                    onChange={handleChange}
                     required
                   />
                 </div>
                 <Button
                   type="submit"
+                  disabled={loading}
                   className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
                 >
-                  Register
+                  {loading ? "Creating Account..." : "Register"}
                 </Button>
               </div>
               <div className="text-center text-sm">
