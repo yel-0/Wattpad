@@ -119,18 +119,14 @@ const Navbar = ({
         {
           title: "Help Center",
           description: "Find answers to your questions and get support",
-          url: "#",
+          url: "/Faq",
         },
         {
           title: "Contact Us",
           description: "Reach out to us for any inquiries or assistance",
-          url: "#",
+          url: "/Contact",
         },
-        {
-          title: "Status",
-          description: "Check the current status of our services and APIs",
-          url: "#",
-        },
+
         {
           title: "Terms of Service",
           description: "Review the terms and conditions for using our platform",
