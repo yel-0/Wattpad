@@ -1,3 +1,5 @@
+"use client";
+
 import { Book, Menu, Search, Sunset, Trees, Zap } from "lucide-react";
 import {
   Accordion,
@@ -23,6 +25,10 @@ import {
 } from "@/components/ui/sheet";
 import { JSX } from "react";
 import { Input } from "@/components/ui/input";
+import AuthUser from "./AuthUser";
+import { SessionProvider } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import AuthUserMobile from "./AuthUserMobile";
 
 interface MenuItem {
   title: string;
@@ -145,100 +151,92 @@ const Navbar = ({
   },
 }: Navbar1Props) => {
   return (
-    <section className="py-4 flex flex-row border-b justify-center items-center ">
-      <div className="container ">
-        <nav className="hidden justify-between lg:flex">
-          <div className="flex items-center gap-6">
-            <a href={logo.url} className="flex items-center gap-2">
-              <img src={logo.src} className="w-8" alt={logo.alt} />
-              <span className="text-lg font-semibold">{logo.title}</span>
-            </a>
-            <div className="flex items-center">
-              <NavigationMenu>
-                <NavigationMenuList>
-                  {menu.map((item) => renderMenuItem(item))}
-                </NavigationMenuList>
-              </NavigationMenu>
-              <div className="relative ml-3 max-w-xs mx-auto">
-                <Input
-                  placeholder="Search..."
-                  className="w-full py-2 pl-3 pr-10 border rounded-lg"
-                />
-                <Search
-                  size={16}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-                />
+    <SessionProvider>
+      <section className="py-4  flex flex-row border-b justify-center items-center ">
+        <div className="container ">
+          <nav className="hidden justify-between lg:flex">
+            <div className="flex items-center gap-6">
+              <a href={logo.url} className="flex items-center gap-2">
+                <img src={logo.src} className="w-8" alt={logo.alt} />
+                <span className="text-lg font-semibold">{logo.title}</span>
+              </a>
+              <div className="flex items-center">
+                <NavigationMenu>
+                  <NavigationMenuList>
+                    {menu.map((item) => renderMenuItem(item))}
+                  </NavigationMenuList>
+                </NavigationMenu>
+                <div className="relative ml-3 max-w-xs mx-auto">
+                  <Input
+                    placeholder="Search..."
+                    className="w-full py-2 pl-3 pr-10 border rounded-lg"
+                  />
+                  <Search
+                    size={16}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                  />
+                </div>
               </div>
             </div>
-          </div>
-          <div className="flex gap-2">
-            <Button asChild variant="outline" size="sm">
-              <a href={auth.login.url}>{auth.login.text}</a>
-            </Button>
-            <Button asChild size="sm">
-              <a href={auth.signup.url}>{auth.signup.text}</a>
-            </Button>
-          </div>
-        </nav>
-        <div className="block lg:hidden">
-          <div className="flex items-center justify-between">
-            <a href={logo.url} className="flex items-center gap-2">
-              <img src={logo.src} className="w-8" alt={logo.alt} />
-              <span className="text-lg font-semibold">{logo.title}</span>
-            </a>
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="outline" size="icon">
-                  <Menu className="size-4" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent className="overflow-y-auto">
-                <SheetHeader>
-                  <SheetTitle>
-                    <a href={logo.url} className="flex items-center gap-2">
-                      <img src={logo.src} className="w-8" alt={logo.alt} />
-                      <span className="text-lg font-semibold">
-                        {logo.title}
-                      </span>
-                    </a>
-                  </SheetTitle>
-                </SheetHeader>
-                <div className="my-6 flex flex-col gap-6">
-                  <Accordion
-                    type="single"
-                    collapsible
-                    className="flex w-full flex-col gap-4"
-                  >
-                    {menu.map((item) => renderMobileMenuItem(item))}
-                  </Accordion>
-                  <div className="border-t py-4">
-                    <div className="grid grid-cols-2 justify-start">
-                      {mobileExtraLinks.map((link, idx) => (
-                        <a
-                          key={idx}
-                          className="inline-flex h-10 items-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-accent-foreground"
-                          href={link.url}
-                        >
-                          {link.name}
-                        </a>
-                      ))}
+            <div className="flex  justify-center items-center gap-2">
+              <AuthUser />
+            </div>
+          </nav>
+          <div className="block lg:hidden">
+            <div className="flex items-center justify-between">
+              <a href={logo.url} className="flex items-center gap-2">
+                <img src={logo.src} className="w-8" alt={logo.alt} />
+                <span className="text-lg font-semibold">{logo.title}</span>
+              </a>
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="outline" size="icon">
+                    <Menu className="size-4" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent className="overflow-y-auto">
+                  <SheetHeader>
+                    <SheetTitle>
+                      <a href={logo.url} className="flex items-center gap-2">
+                        <img src={logo.src} className="w-8" alt={logo.alt} />
+                        <span className="text-lg font-semibold">
+                          {logo.title}
+                        </span>
+                      </a>
+                    </SheetTitle>
+                  </SheetHeader>
+                  <div className="my-6 flex flex-col gap-6">
+                    <Accordion
+                      type="single"
+                      collapsible
+                      className="flex w-full flex-col gap-4"
+                    >
+                      {menu.map((item) => renderMobileMenuItem(item))}
+                    </Accordion>
+                    <div className="border-t py-4">
+                      <div className="grid grid-cols-2 justify-start">
+                        {mobileExtraLinks.map((link, idx) => (
+                          <a
+                            key={idx}
+                            className="inline-flex h-10 items-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-accent-foreground"
+                            href={link.url}
+                          >
+                            {link.name}
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-3">
+                      <AuthUserMobile />
                     </div>
                   </div>
-                  <div className="flex flex-col gap-3">
-                    <Button asChild variant="outline">
-                      <a href={auth.login.url}>{auth.login.text}</a>
-                    </Button>
-                    <Button asChild>
-                      <a href={auth.signup.url}>{auth.signup.text}</a>
-                    </Button>
-                  </div>
-                </div>
-              </SheetContent>
-            </Sheet>
+                </SheetContent>
+              </Sheet>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </SessionProvider>
   );
 };
 
