@@ -102,13 +102,7 @@ export default async function Home() {
       </div>
       <BookCarousel books={books} />
 
-      <div className="text-sm mt-6  text-black opacity-75">
-        Fall head over heels
-      </div>
-      <div className="text-lg sm:text-xl mb-5 font-semibold text-black">
-        Love at first sentence 📖💘
-      </div>
-      <StoryCarousel stories={stories} />
+      <StoryCarousel />
 
       <div className="text-sm mt-6  text-black opacity-75">
         Fall head over heels
