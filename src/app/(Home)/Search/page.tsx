@@ -1,8 +1,8 @@
-import { SearchFilters } from "../components/Share/SearchFilters";
-import { SearchStoryCard } from "../components/Share/SearchStoryCard";
+import { SearchFilters } from "../../components/Share/SearchFilters";
+import { SearchStoryCard } from "../../components/Share/SearchStoryCard";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import UserCard from "../components/Share/UserCard";
+import UserCard from "../../components/Share/UserCard";
 
 const stories = [
   {

@@ -60,11 +60,18 @@ export default function RegisterPage() {
     <div className="grid min-h-screen lg:grid-cols-2">
       <div className="flex flex-col gap-4 p-6 md:p-10">
         <div className="flex justify-center gap-2 md:justify-start">
-          <a href="#" className="flex items-center gap-2 font-medium">
-            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
-              <GalleryVerticalEnd className="size-4" />
-            </div>
-            Acme Inc.
+          <a
+            href={"http://localhost:3000/"}
+            className="flex items-center gap-2"
+          >
+            <img
+              src={
+                "https://www.wattpad.com/wp-web-assets/images/wattpad-logo.svg"
+              }
+              className="w-8"
+              alt={"Logo"}
+            />
+            <span className="text-lg font-semibold">{"Wattpad"}</span>
           </a>
         </div>
         <div className="flex flex-1 items-center justify-center">

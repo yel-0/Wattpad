@@ -1,9 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import MyWorkStoryCard from "../components/User/MyWorkStoryCard";
 import Link from "next/link";
-
+import MyWorkStoryCard from "@/app/components/User/MyWorkStoryCard";
 const MyWork = () => {
   return (
     <div className="min-h-screen  container max-w-2xl p-4 mx-auto">

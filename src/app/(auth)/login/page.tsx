@@ -10,7 +10,6 @@ import { Label } from "@/components/ui/label";
 import Login from "../../../../public/Login.jpg";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
-import Spinner from "@/app/components/Share/Spinner";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -64,11 +63,18 @@ export default function LoginPage() {
     <div className="grid min-h-screen lg:grid-cols-2">
       <div className="flex flex-col gap-4 p-6 md:p-10">
         <div className="flex justify-center gap-2 md:justify-start">
-          <a href="#" className="flex items-center gap-2 font-medium">
-            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
-              <GalleryVerticalEnd className="size-4" />
-            </div>
-            Acme Inc.
+          <a
+            href={"http://localhost:3000/"}
+            className="flex items-center gap-2"
+          >
+            <img
+              src={
+                "https://www.wattpad.com/wp-web-assets/images/wattpad-logo.svg"
+              }
+              className="w-8"
+              alt={"Logo"}
+            />
+            <span className="text-lg font-semibold">{"Wattpad"}</span>
           </a>
         </div>
 
@@ -128,7 +134,7 @@ export default function LoginPage() {
               </div>
               <div className="text-center text-sm">
                 Don&apos;t have an account?{" "}
-                <a href="#" className="underline underline-offset-4">
+                <a href="/register" className="underline underline-offset-4">
                   Sign up
                 </a>
               </div>

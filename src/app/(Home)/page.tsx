@@ -1,10 +1,9 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { BookCarousel } from "./components/User/BookCarousel";
-import ImageCarousel from "./components/User/ImageCarousel";
-import StoryCard from "./components/User/StoryCard";
-import { StoryCarousel } from "./components/User/StoryCarousel";
 
+import { BookCarousel } from "../components/User/BookCarousel";
+import { StoryCarousel } from "../components/User/StoryCarousel";
+import ImageCarousel from "../components/User/ImageCarousel";
 const books = [
   {
     imageUrl: "https://img.wattpad.com/cover/370885712-256-k364296.jpg",

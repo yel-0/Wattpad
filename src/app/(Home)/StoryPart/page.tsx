@@ -3,7 +3,7 @@
 import { Heart, Share2, Star } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { ChapterSelect } from "../components/Share/ChapterSelect";
+import { ChapterSelect } from "../../components/Share/ChapterSelect";
 
 export default function StoryReader() {
   return (
