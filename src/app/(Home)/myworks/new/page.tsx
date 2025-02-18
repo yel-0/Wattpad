@@ -20,12 +20,22 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+interface Character {
+  id: number;
+  name: string;
+}
+
 export default function StoryEditor() {
-  const [title, setTitle] = useState("Untitled Story");
-  const [characters, setCharacters] = useState([{ id: 1, name: "" }]);
-  const [tags, setTags] = useState<string[]>([]);
-  const [isMature, setIsMature] = useState(false);
-  const [coverImage, setCoverImage] = useState("");
+  const [title, setTitle] = useState<string>("Untitled Story");
+  const [description, setDescription] = useState<string>("");
+  const [characters, setCharacters] = useState<Character[]>([
+    { id: 1, name: "" },
+  ]);
+  const [category, setCategory] = useState<string>("");
+  const [language, setLanguage] = useState<string>("1");
+  const [copyright, setCopyright] = useState<string>("1");
+  const [isMature, setIsMature] = useState<boolean>(false);
+  const [coverImage, setCoverImage] = useState<string>("");
 
   const addCharacter = () => {
     setCharacters([...characters, { id: Date.now(), name: "" }]);
@@ -42,15 +52,29 @@ export default function StoryEditor() {
     }
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const formData = {
+      title,
+      description,
+      characters,
+      category,
+      language,
+      copyright,
+      isMature,
+      coverImage,
+    };
+    console.log("Form Data:", formData);
+  };
+
   return (
-    <div className="container mx-auto px-4 py-8">
+    <form onSubmit={handleSubmit} className="container mx-auto px-4 py-8">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Left Sidebar */}
         <div className="lg:col-span-3">
           <div className="relative aspect-[3/4] bg-muted rounded-lg overflow-hidden">
             {coverImage ? (
               <Image
-                src={coverImage || "/placeholder.svg"}
+                src={coverImage}
                 alt="Story cover"
                 fill
                 className="object-cover"
@@ -82,7 +106,6 @@ export default function StoryEditor() {
           </div>
         </div>
 
-        {/* Main Content */}
         <div className="lg:col-span-8 lg:col-start-5">
           <div className="space-y-8">
             <div>
@@ -93,75 +116,54 @@ export default function StoryEditor() {
                 Story Details
               </Button>
             </div>
-
             <div className="space-y-6">
-              {/* Title */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">Title</label>
-                <div
-                  contentEditable
-                  className="p-2 border rounded-md min-h-[40px]"
-                  onBlur={(e) =>
-                    setTitle(e.currentTarget.textContent || "Untitled Story")
-                  }
-                  dangerouslySetInnerHTML={{ __html: title }}
+                <input
+                  type="text"
+                  className="p-2 border rounded-md w-full"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
                 />
               </div>
 
-              {/* Description */}
               <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <label className="text-sm font-medium">Description</label>
-                  <Info className="h-4 w-4 text-muted-foreground" />
-                </div>
+                <label className="text-sm font-medium">Description</label>
                 <Textarea
                   placeholder="Write your story description..."
                   className="min-h-[100px]"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
                 />
               </div>
 
-              {/* Characters */}
               <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <label className="text-sm font-medium">Main Characters</label>
-                  <Info className="h-4 w-4 text-muted-foreground" />
-                </div>
-                <div className="space-y-2">
-                  {characters.map((char) => (
-                    <div key={char.id} className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        placeholder="Name"
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                        value={char.name}
-                        onChange={(e) => {
-                          const newCharacters = [...characters];
-                          const index = newCharacters.findIndex(
-                            (c) => c.id === char.id
-                          );
-                          newCharacters[index].name = e.target.value;
-                          setCharacters(newCharacters);
-                        }}
-                      />
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        onClick={addCharacter}
-                      >
-                        <Plus className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
+                {characters.map((char) => (
+                  <div key={char.id} className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      placeholder="Name"
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      value={char.name}
+                      onChange={(e) => {
+                        const newCharacters = [...characters];
+                        const index = newCharacters.findIndex(
+                          (c) => c.id === char.id
+                        );
+                        newCharacters[index].name = e.target.value;
+                        setCharacters(newCharacters);
+                      }}
+                    />
+                    <Button size="icon" variant="ghost" onClick={addCharacter}>
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
               </div>
 
-              {/* Category */}
               <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <label className="text-sm font-medium">Category</label>
-                  <Info className="h-4 w-4 text-muted-foreground" />
-                </div>
-                <Select>
+                <label className="text-sm font-medium">Category</label>
+                <Select onValueChange={setCategory}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
@@ -169,21 +171,14 @@ export default function StoryEditor() {
                     <SelectItem value="14">Action</SelectItem>
                     <SelectItem value="11">Adventure</SelectItem>
                     <SelectItem value="24">ChickLit</SelectItem>
-                    <SelectItem value="6">Fanfiction</SelectItem>
-                    <SelectItem value="3">Fantasy</SelectItem>
-                    {/* Add other categories */}
                   </SelectContent>
                 </Select>
               </div>
 
-              {/* Language and Copyright */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <label className="text-sm font-medium">Language</label>
-                    <Info className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                  <Select defaultValue="1">
+                  <label className="text-sm font-medium">Language</label>
+                  <Select onValueChange={setLanguage} defaultValue={language}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -191,17 +186,13 @@ export default function StoryEditor() {
                       <SelectItem value="1">English</SelectItem>
                       <SelectItem value="5">Español</SelectItem>
                       <SelectItem value="2">Français</SelectItem>
-                      {/* Add other languages */}
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <label className="text-sm font-medium">Copyright</label>
-                    <Info className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                  <Select defaultValue="1">
+                  <label className="text-sm font-medium">Copyright</label>
+                  <Select onValueChange={setCopyright} defaultValue={copyright}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -216,27 +207,16 @@ export default function StoryEditor() {
                 </div>
               </div>
 
-              {/* Mature Content Toggle */}
               <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <div className="flex items-center gap-2">
-                    <label className="text-sm font-medium">
-                      Mature Content
-                    </label>
-                    <Info className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    {isMature
-                      ? "Your story contains mature themes"
-                      : "Your story is appropriate for all audiences"}
-                  </p>
-                </div>
+                <label className="text-sm font-medium">Mature Content</label>
                 <Switch checked={isMature} onCheckedChange={setIsMature} />
               </div>
+
+              <Button type="submit">Submit</Button>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </form>
   );
 }
