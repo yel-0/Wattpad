@@ -19,41 +19,53 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-interface Character {
-  id: number;
-  name: string;
-}
+import { CreateStory } from "@/app/(acttion)/Story/action";
 
 export default function StoryEditor() {
   const [title, setTitle] = useState<string>("Untitled Story");
   const [description, setDescription] = useState<string>("");
-  const [characters, setCharacters] = useState<Character[]>([
-    { id: 1, name: "" },
-  ]);
+  const [characters, setCharacters] = useState<string[]>([""]);
   const [category, setCategory] = useState<string>("");
   const [language, setLanguage] = useState<string>("1");
   const [copyright, setCopyright] = useState<string>("1");
   const [isMature, setIsMature] = useState<boolean>(false);
   const [coverImage, setCoverImage] = useState<string>("");
+  const [message, setMessage] = useState("");
 
   const addCharacter = () => {
-    setCharacters([...characters, { id: Date.now(), name: "" }]);
+    setCharacters([...characters, ""]);
+  };
+
+  const handleCharacterChange = (index: number, value: string) => {
+    const updatedCharacters = [...characters];
+    updatedCharacters[index] = value;
+    setCharacters(updatedCharacters);
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setCoverImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+
+    if (!file) {
+      console.log("No file selected");
+      return;
     }
+
+    console.log("Selected file:", file);
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      console.log("File Read as Data URL:", reader.result);
+      setCoverImage(reader.result as string);
+    };
+
+    reader.onerror = (error) => console.error("Error reading file:", error);
+
+    reader.readAsDataURL(file);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     const formData = {
       title,
       description,
@@ -62,9 +74,15 @@ export default function StoryEditor() {
       language,
       copyright,
       isMature,
-      coverImage,
     };
-    console.log("Form Data:", formData);
+
+    const response = await CreateStory(formData);
+
+    if (response.success) {
+      setMessage(response.message);
+    } else {
+      setMessage("Failed to create story.");
+    }
   };
 
   return (
@@ -82,25 +100,17 @@ export default function StoryEditor() {
             ) : (
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <Upload className="h-12 w-12 text-muted-foreground mb-2" />
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="secondary">Add a cover</Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem>
-                      <label className="cursor-pointer w-full">
-                        Upload Cover
-                        <input
-                          type="file"
-                          className="hidden"
-                          accept="image/jpeg, image/png, image/gif"
-                          onChange={handleImageUpload}
-                        />
-                      </label>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>Create Cover</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+
+                <label className="cursor-pointer text-sm text-center w-full">
+                  Upload Cover
+                  <input
+                    type="file"
+                    className="hidden"
+                    onChange={(e) => {
+                      handleImageUpload(e);
+                    }}
+                  />
+                </label>
               </div>
             )}
           </div>
@@ -138,21 +148,17 @@ export default function StoryEditor() {
               </div>
 
               <div className="space-y-2">
-                {characters.map((char) => (
-                  <div key={char.id} className="flex items-center gap-2">
+                <label className="text-sm font-medium">Characters</label>
+                {characters.map((char, index) => (
+                  <div key={index} className="flex items-center gap-2">
                     <input
                       type="text"
                       placeholder="Name"
                       className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                      value={char.name}
-                      onChange={(e) => {
-                        const newCharacters = [...characters];
-                        const index = newCharacters.findIndex(
-                          (c) => c.id === char.id
-                        );
-                        newCharacters[index].name = e.target.value;
-                        setCharacters(newCharacters);
-                      }}
+                      value={char}
+                      onChange={(e) =>
+                        handleCharacterChange(index, e.target.value)
+                      }
                     />
                     <Button size="icon" variant="ghost" onClick={addCharacter}>
                       <Plus className="h-4 w-4" />
