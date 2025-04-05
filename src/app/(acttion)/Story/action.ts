@@ -1,27 +1,52 @@
 "use server";
 
-import User from "@/models/User";
-import { connectToDatabase } from "@/lib/mongodb";
+import { v2 as cloudinary } from "cloudinary";
 
-export async function CreateStory(formData: {
-  title: string;
-  description: string;
-  characters: string[];
-  category: string;
-  language: string;
-  copyright: string;
-  isMature: boolean;
-}) {
+cloudinary.config({
+  cloud_name: "dcgn707fg",
+  api_key: "447553432962878",
+  api_secret: "B392SZv18oPqrYoIviTDVaHEjq4",
+});
+export async function CreateStory(formData: FormData) {
   try {
-    // Simulate saving data to a database (replace with actual DB logic)
-    console.log("Received Story Data:", formData);
+    // Extract form data from FormData object
+    const title = formData.get("title") as string;
+    const description = formData.get("description") as string;
+    const category = formData.get("category") as string;
+    const language = formData.get("language") as string;
+    const copyright = formData.get("copyright") as string;
+    const visibility = formData.get("visibility") as string;
 
-    // Example: If using a database, insert the data here
-    // await db.story.create({ data: formData });
+    // Handle the file (coverImage)
+    const coverImage = formData.get("coverImage") as File;
+    if (coverImage) {
+      console.log("Cover Image:", coverImage);
+      // Optionally handle file upload (e.g., save it to a server or cloud storage)
+    }
 
-    return { success: true, message: "Story created successfully!" };
+    console.log(formData);
+
+    const arrayBuffer = await coverImage.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    // await new Promise((resolve, reject) => {
+    //   cloudinary.uploader
+    //     .upload_stream(
+    //       {
+    //         tags: ["nextjs-server-actions-upload-sneakers"],
+    //         upload_preset: "nextjs-server-actions-upload",
+    //       },
+    //       function (error, result) {
+    //         if (error) {
+    //           reject(error);
+    //           return;
+    //         }
+    //         resolve(result);
+    //       }
+    //     )
+    //     .end(buffer);
+    // });
   } catch (error) {
     console.error("Error creating story:", error);
-    return { success: false, message: "Failed to create story." };
   }
 }

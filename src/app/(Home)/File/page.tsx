@@ -13,26 +13,27 @@ async function Home() {
     const file = formData.get("image") as File;
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
+    console.log(file);
 
-    await new Promise((resolve, reject) => {
-      cloudinary.uploader
-        .upload_stream(
-          {
-            tags: ["nextjs-server-actions-upload-sneakers"],
-            upload_preset: "nextjs-server-actions-upload",
-          },
-          function (error, result) {
-            if (error) {
-              reject(error);
-              return;
-            }
-            resolve(result);
-          }
-        )
-        .end(buffer);
-    });
+    // await new Promise((resolve, reject) => {
+    //   cloudinary.uploader
+    //     .upload_stream(
+    //       {
+    //         tags: ["nextjs-server-actions-upload-sneakers"],
+    //         upload_preset: "nextjs-server-actions-upload",
+    //       },
+    //       function (error, result) {
+    //         if (error) {
+    //           reject(error);
+    //           return;
+    //         }
+    //         resolve(result);
+    //       }
+    //     )
+    //     .end(buffer);
+    // });
 
-    revalidatePath("/");
+    // revalidatePath("/");
   }
   return (
     <div>

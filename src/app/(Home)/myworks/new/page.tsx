@@ -11,51 +11,33 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { Info, Plus, Upload } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Upload } from "lucide-react";
 import { CreateStory } from "@/app/(acttion)/Story/action";
 
 export default function StoryEditor() {
   const [title, setTitle] = useState<string>("Untitled Story");
   const [description, setDescription] = useState<string>("");
-  const [characters, setCharacters] = useState<string[]>([""]);
   const [category, setCategory] = useState<string>("");
-  const [language, setLanguage] = useState<string>("1");
+  const [language, setLanguage] = useState<string>("English");
   const [copyright, setCopyright] = useState<string>("1");
-  const [isMature, setIsMature] = useState<boolean>(false);
   const [coverImage, setCoverImage] = useState<string>("");
-  const [message, setMessage] = useState("");
+  const [imgFile, setImgFile] = useState<File | null>(null);
+  const [visibility, setVisibility] = useState<"public" | "private">("public");
 
-  const addCharacter = () => {
-    setCharacters([...characters, ""]);
-  };
-
-  const handleCharacterChange = (index: number, value: string) => {
-    const updatedCharacters = [...characters];
-    updatedCharacters[index] = value;
-    setCharacters(updatedCharacters);
-  };
+  // Assuming the author is the currently logged-in user
+  const author = "60f77b5f13f7c923ec78d106"; // Replace this with actual user ID
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
 
     if (!file) {
-      console.log("No file selected");
       return;
     }
 
-    console.log("Selected file:", file);
-
     const reader = new FileReader();
     reader.onloadend = () => {
-      console.log("File Read as Data URL:", reader.result);
       setCoverImage(reader.result as string);
+      setImgFile(file); // actual file to upload
     };
 
     reader.onerror = (error) => console.error("Error reading file:", error);
@@ -66,23 +48,22 @@ export default function StoryEditor() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const formData = {
-      title,
-      description,
-      characters,
-      category,
-      language,
-      copyright,
-      isMature,
-    };
+    const formData = new FormData();
 
-    const response = await CreateStory(formData);
+    formData.append("title", title);
+    formData.append("description", description);
+    formData.append("category", category);
+    formData.append("language", language);
+    formData.append("copyright", copyright);
+    formData.append("visibility", visibility); // Include visibility
 
-    if (response.success) {
-      setMessage(response.message);
-    } else {
-      setMessage("Failed to create story.");
+    if (imgFile) {
+      formData.append("coverImage", imgFile); // Pass the file directly here
     }
+
+    // Send the formData to the server-side handler
+    const response = await CreateStory(formData);
+    // console.log(response);
   };
 
   return (
@@ -104,11 +85,12 @@ export default function StoryEditor() {
                 <label className="cursor-pointer text-sm text-center w-full">
                   Upload Cover
                   <input
+                    id="image"
                     type="file"
+                    name="image"
                     className="hidden"
-                    onChange={(e) => {
-                      handleImageUpload(e);
-                    }}
+                    onChange={handleImageUpload}
+                    required
                   />
                 </label>
               </div>
@@ -148,35 +130,15 @@ export default function StoryEditor() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Characters</label>
-                {characters.map((char, index) => (
-                  <div key={index} className="flex items-center gap-2">
-                    <input
-                      type="text"
-                      placeholder="Name"
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                      value={char}
-                      onChange={(e) =>
-                        handleCharacterChange(index, e.target.value)
-                      }
-                    />
-                    <Button size="icon" variant="ghost" onClick={addCharacter}>
-                      <Plus className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-
-              <div className="space-y-2">
                 <label className="text-sm font-medium">Category</label>
                 <Select onValueChange={setCategory}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="14">Action</SelectItem>
-                    <SelectItem value="11">Adventure</SelectItem>
-                    <SelectItem value="24">ChickLit</SelectItem>
+                    <SelectItem value="action">Action</SelectItem>
+                    <SelectItem value="adventure">Adventure</SelectItem>
+                    <SelectItem value="chickLit">ChickLit</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -189,9 +151,9 @@ export default function StoryEditor() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="1">English</SelectItem>
-                      <SelectItem value="5">Español</SelectItem>
-                      <SelectItem value="2">Français</SelectItem>
+                      <SelectItem value="English">English</SelectItem>
+                      <SelectItem value="Español">Español</SelectItem>
+                      <SelectItem value="Français">Français</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -213,9 +175,22 @@ export default function StoryEditor() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-medium">Mature Content</label>
-                <Switch checked={isMature} onCheckedChange={setIsMature} />
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Visibility</label>
+                <Select
+                  onValueChange={(value: "public" | "private") =>
+                    setVisibility(value)
+                  }
+                  defaultValue={visibility}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="public">Public</SelectItem>
+                    <SelectItem value="private">Private</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <Button type="submit">Submit</Button>
