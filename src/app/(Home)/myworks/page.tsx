@@ -1,9 +1,9 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import MyWorkStoryCard from "@/app/components/User/MyWorkStoryCard";
-const MyWork = () => {
+import { GetStoriesByAuthor } from "@/app/(acttion)/Story/action";
+const MyWork = async () => {
+  const result = await GetStoriesByAuthor(1);
   return (
     <div className="min-h-screen  container max-w-2xl p-4 mx-auto">
       <div className="flex flex-row py-4 justify-between items-center">
@@ -14,10 +14,9 @@ const MyWork = () => {
           </Button>
         </Link>
       </div>
-      <MyWorkStoryCard />
-      <MyWorkStoryCard />
-      <MyWorkStoryCard />
-      <MyWorkStoryCard />
+      {result?.stories?.map((story: any) => (
+        <MyWorkStoryCard key={story._id} story={story} />
+      ))}
     </div>
   );
 };
