@@ -4,6 +4,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { BookCarousel } from "../components/User/BookCarousel";
 import { StoryCarousel } from "../components/User/StoryCarousel";
 import ImageCarousel from "../components/User/ImageCarousel";
+import { FetchStoriesByCategoryName } from "../(acttion)/Story/action";
 const books = [
   {
     imageUrl: "https://img.wattpad.com/cover/370885712-256-k364296.jpg",
@@ -84,6 +85,15 @@ const stories = [
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
+  const { stories } = await FetchStoriesByCategoryName(1, "action");
+  const { stories: Adventure } = await FetchStoriesByCategoryName(
+    1,
+    "adventure"
+  );
+
+  const actionStories = JSON.parse(JSON.stringify(stories));
+
+  const adv = JSON.parse(JSON.stringify(Adventure));
 
   return (
     <main className="container mx-auto px-4 md:px-10 lg:px-20 mt-5">
@@ -91,7 +101,17 @@ export default async function Home() {
       <div className="text-lg my-6 sm:text-xl font-semibold text-black">
         Featured Books
       </div>
-      <BookCarousel books={books} />
+      <BookCarousel books={actionStories} />
+
+      <div className="text-sm mt-6  text-black opacity-75">
+        Fall head over heels
+      </div>
+      <div className="text-lg sm:text-xl font-semibold text-black">
+        Love at first sentence 📖💘
+      </div>
+      <BookCarousel books={adv} />
+
+      {/* <StoryCarousel />
 
       <div className="text-sm mt-6  text-black opacity-75">
         Fall head over heels
@@ -101,70 +121,13 @@ export default async function Home() {
       </div>
       <BookCarousel books={books} />
 
-      <StoryCarousel />
-
       <div className="text-sm mt-6  text-black opacity-75">
         Fall head over heels
       </div>
       <div className="text-lg sm:text-xl font-semibold text-black">
         Love at first sentence 📖💘
       </div>
-      <BookCarousel books={books} />
-
-      <div className="text-sm mt-6  text-black opacity-75">
-        Fall head over heels
-      </div>
-      <div className="text-lg sm:text-xl font-semibold text-black">
-        Love at first sentence 📖💘
-      </div>
-      <BookCarousel books={books} />
+      <BookCarousel books={books} /> */}
     </main>
   );
-}
-
-{
-  /* <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-<h1 className="text-xl font-bold">Welcome to Next.js</h1>
-
-<div className="p-4 border rounded-lg bg-gray-100 w-full max-w-lg text-center">
-  {session ? (
-    <>
-      <p className="font-semibold">Logged in as:</p>
-      <p>
-        {session.user?.name} ({session.user?.email}):(
-        {session.user?.isAdmin ? "admin" : "user"})
-      </p>
-    </>
-  ) : (
-    <p className="text-red-500">Not logged in</p>
-  )}
-
-</div>
-</div> */
-}
-
-// import { User } from "@/types/User";
-
-// async function getUsers(): Promise<User[]> {
-//   const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/users`, {
-//     cache: "no-store",
-//   });
-
-//   if (!res.ok) throw new Error("Failed to fetch users");
-
-//   return res.json();
-// }
-
-// const users = await getUsers();
-{
-  /* <div className="w-full max-w-lg">
-<h2 className="text-lg font-semibold">User List</h2>
-<ul className="mt-4 space-y-2">
-  {users.map((user) => (
-    <li key={user._id} className="p-2 border rounded-lg">
-      {user.name} - {user.email} - {user.isAdmin ? "Admin" : "User"}
-    </li>
-  ))}
-</ul>
-</div> */
 }

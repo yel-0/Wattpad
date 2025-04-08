@@ -3,6 +3,7 @@
 import { connectToDatabase } from "@/lib/mongodb";
 import Story from "@/models/Story";
 import StoryPart from "@/models/StoryPart";
+import { JSONContent } from "@tiptap/react";
 import mongoose from "mongoose";
 
 type CreateStoryPartParams = {
@@ -62,6 +63,62 @@ export async function createStoryPart({
       success: false,
       error:
         error instanceof Error ? error.message : "Failed to create story part.",
+    };
+  }
+}
+interface UpdateStoryPartParams {
+  storyPartId: string;
+  title: string;
+  content: JSONContent;
+  visibility: "public" | "private";
+}
+
+export async function updateStoryPart({
+  storyPartId,
+  title,
+  content,
+  visibility,
+}: UpdateStoryPartParams) {
+  try {
+    await connectToDatabase();
+
+    // Start a transaction to ensure the operation is completed or rolled back in case of failure
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      // 1. Update the existing story part
+      const updatedPart = await StoryPart.findByIdAndUpdate(
+        storyPartId,
+        { title, content, visibility },
+        { new: true, session }
+      );
+
+      if (!updatedPart) {
+        throw new Error("Story part not found.");
+      }
+
+      await session.commitTransaction();
+      session.endSession();
+
+      return {
+        success: true,
+        data: {
+          _id: updatedPart._id.toString(),
+          storyId: updatedPart.story.toString(),
+        },
+      };
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
+    }
+  } catch (error) {
+    console.error("Error updating story part:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Failed to update story part.",
     };
   }
 }

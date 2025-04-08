@@ -26,8 +26,12 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 import { useParams } from "next/navigation";
-import { getStoryAndPart } from "@/app/(acttion)/StoryPart/action";
+import {
+  getStoryAndPart,
+  updateStoryPart,
+} from "@/app/(acttion)/StoryPart/action";
 import Link from "next/link";
+import router from "next/router";
 
 export default function Editor({
   data,
@@ -50,6 +54,30 @@ export default function Editor({
     },
     content: data.part.content,
   });
+
+  const handleUpdateStory = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const visibility = "public";
+
+    const content = editor?.getJSON() || {};
+
+    const result = await updateStoryPart({
+      storyPartId: storyPartId,
+      title: title || "Untitled Part",
+      content,
+      visibility,
+    });
+
+    if (result.success) {
+      // router.push(`/CreateStoryPart/${storyId}/${result.data?._id}`);
+      alert("success");
+    } else {
+      console.error("❌ Failed to create story part:", result.error);
+      alert("error");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <nav className="border-b p-4 flex justify-between items-center">
@@ -66,7 +94,10 @@ export default function Editor({
 
             <DropdownMenuContent className="w-80 p-2">
               {data.story.parts?.map((part: any, idx: any) => (
-                <Link key={idx} href={``}>
+                <Link
+                  key={idx}
+                  href={`/CreateStoryPart/${storyId}/${part._id}`}
+                >
                   <DropdownMenuItem className="flex items-center gap-2">
                     <span>{part.title || `Chapter ${idx + 1}`}</span>
                   </DropdownMenuItem>
@@ -150,7 +181,7 @@ export default function Editor({
             </p>
             <div className="flex justify-end space-x-2">
               <Button variant="outline">Cancel</Button>
-              <form>
+              <form onSubmit={handleUpdateStory}>
                 <Button type="submit">Publish</Button>
               </form>
             </div>

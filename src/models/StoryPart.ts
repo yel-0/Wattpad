@@ -13,7 +13,10 @@ const StoryPartSchema: Schema<IStoryPart> = new Schema(
   {
     story: { type: Schema.Types.ObjectId, ref: "Story", required: true },
     title: { type: Schema.Types.String, required: true },
-    content: { type: Schema.Types.String, required: true },
+    content: {
+      type: Schema.Types.Mixed, // This will accept any object, including JSONContent
+      required: true,
+    },
     visibility: {
       type: Schema.Types.String,
       enum: ["public", "private"],

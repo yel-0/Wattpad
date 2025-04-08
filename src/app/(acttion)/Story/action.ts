@@ -5,6 +5,7 @@ import { connectToDatabase } from "@/lib/mongodb";
 import { getServerSession } from "next-auth";
 import { v2 as cloudinary } from "cloudinary";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import mongoose from "mongoose";
 
 // Configure Cloudinary
 cloudinary.config({
@@ -151,6 +152,49 @@ export async function GetStoriesByAuthor(page: number = 1) {
   }
 }
 
+export async function FetchStoriesByCategoryName(
+  page: number = 1,
+  categoryName: string
+) {
+  try {
+    const limit = 10;
+    const skip = (page - 1) * limit;
+
+    await connectToDatabase();
+
+    const [stories, totalCount] = await Promise.all([
+      Story.find({ category: categoryName }) // Filter by category name
+        .sort({ createdAt: -1 })
+        .select("_id title visibility coverImage createdAt updatedAt language") // Only the fields you need
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+
+      Story.countDocuments({ category: categoryName }), // Count the total stories for the category
+    ]);
+
+    const totalPages = Math.ceil(totalCount / limit);
+
+    return {
+      success: true,
+      stories: stories || [], // Ensure an empty array if undefined,
+      pagination: {
+        page,
+        totalPages,
+        totalCount,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching stories by category:", error);
+    return {
+      success: false,
+      message: "Failed to fetch stories by category",
+    };
+  }
+}
+
 function extractPublicIdFromUrl(url: string): string | null {
   try {
     // Updated regex to handle folders before the filename
@@ -240,5 +284,40 @@ export async function DeleteStoryById(storyId: string) {
   } catch (error) {
     console.error("Delete story error:", error);
     return { success: false, message: "An error occurred." };
+  }
+}
+
+export async function FetchStoryById(storyId: string) {
+  try {
+    // Ensure the storyId is a valid ObjectId
+    const objectId = new mongoose.Types.ObjectId(storyId);
+
+    await connectToDatabase();
+
+    // Fetch the story by its ID and populate the 'parts' field
+    const story = await Story.findById(objectId)
+      .populate("parts") // Populating the 'parts' field with full details
+      .select(
+        "_id title visibility views likes description coverImage createdAt updatedAt language parts"
+      ) // Select only the necessary fields
+      .lean();
+
+    if (!story) {
+      return {
+        success: false,
+        message: "Story not found",
+      };
+    }
+
+    return {
+      success: true,
+      story, // Return the fetched story
+    };
+  } catch (error) {
+    console.error("Error fetching story by ID:", error);
+    return {
+      success: false,
+      message: "Failed to fetch story by ID",
+    };
   }
 }

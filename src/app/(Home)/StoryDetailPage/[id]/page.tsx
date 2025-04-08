@@ -4,42 +4,54 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Book, Clock, ThumbsUp, ListOrdered, Plus } from "lucide-react";
 import Image from "next/image";
+import { FetchStoryById } from "@/app/(acttion)/Story/action";
+import Link from "next/link";
 
-export default function StoryDetailPage() {
+export default async function StoryDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const storyId = (await params).id;
+
+  // Fetch story data by ID
+  const { story } = await FetchStoryById(storyId);
+
+  if (!story) {
+    return <div>Story not found.</div>;
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <main className="container mx-auto py-8 flex justify-center">
         <div className="space-y-8 w-full md:max-w-6xl">
           {/* Book Header */}
-          <div className="grid md:grid-cols-[240px_1fr] gap-8">
-            <Card>
-              <CardContent className="p-0">
-                <Image
-                  src="https://images.unsplash.com/photo-1739104627818-d9159a7daa8d?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwzfHx8ZW58MHx8fHx8"
-                  alt="Book cover"
-                  width={240}
-                  height={360}
-                  className="w-full h-auto"
-                />
-              </CardContent>
-            </Card>
+
+          <div className="grid md:grid-cols-[240px_1fr] h-[360px] gap-8 max-w-full">
+            <div className="w-full h-full">
+              <Image
+                alt="Book cover"
+                src={story?.coverImage || "/default-image.jpg"}
+                width={240}
+                height={360}
+                className="w-full h-full object-cover"
+              />
+            </div>
             <div className="space-y-4">
-              <h1 className="text-3xl font-bold">
-                In 27 Days (Watty Award Winner 2012)
-              </h1>
+              <h1 className="text-3xl font-bold">{story?.title}</h1>
 
               <div className="flex gap-8">
                 <div className="flex items-center gap-2">
                   <Book className="w-4 h-4" />
-                  <span>50.6M Reads</span>
+                  <span>{story?.views || "0"} Reads</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <ThumbsUp className="w-4 h-4" />
-                  <span>2M Votes</span>
+                  <span>{story?.likes || "0"} Likes</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <ListOrdered className="w-4 h-4" />
-                  <span>39 Parts</span>
+                  <span>{story?.parts.length} Parts</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4" />
@@ -66,12 +78,7 @@ export default function StoryDetailPage() {
               </div>
               <Badge variant="secondary">Complete</Badge>
 
-              <p className="text-muted-foreground">
-                Hadley Jamison doesn't know what to think when she hears that
-                her classmate, Archer Morales, committed suicide. She didn't
-                exactly know him, but that doesn't stop her from feeling like
-                there was something she could have done to help him.
-              </p>
+              <p className="text-muted-foreground">{story?.description}</p>
             </div>
           </div>
 
@@ -116,28 +123,24 @@ export default function StoryDetailPage() {
             <CardContent className="p-6">
               <h2 className="text-xl font-semibold mb-4">Table of contents</h2>
               <div className="space-y-4">
-                {[
-                  { title: "Chapter 1", date: "Fri, Dec 2, 2011" },
-                  { title: "Chapter 2", date: "Sat, Dec 3, 2011" },
-                  { title: "Chapter 3", date: "Mon, Dec 5, 2011" },
-                  { title: "Chapter 4", date: "Wed, Dec 7, 2011" },
-                  { title: "Chapter 5", date: "Fri, Dec 9, 2011" },
-                  { title: "Chapter 6", date: "Sun, Dec 11, 2011" },
-                  { title: "Chapter 7", date: "Tue, Dec 13, 2011" },
-                  { title: "Chapter 8", date: "Thu, Dec 15, 2011" },
-                  { title: "Chapter 9", date: "Sat, Dec 17, 2011" },
-                  { title: "Chapter 10", date: "Mon, Dec 19, 2011" },
-                ].map((chapter, index) => (
-                  <div
-                    key={index}
-                    className="flex justify-between py-2 rounded-md transition-colors duration-200 hover:text-orange-400 cursor-pointer"
-                  >
-                    <span>{chapter.title}</span>
-                    <span className="text-muted-foreground">
-                      {chapter.date}
-                    </span>
-                  </div>
-                ))}
+                {story.parts && story.parts.length > 0 ? (
+                  story.parts.map((chapter: any, index) => (
+                    <Link
+                      key={index}
+                      href={`/StoryPart/${storyId}/${chapter._id}`}
+                    >
+                      <div className="flex justify-between py-2 rounded-md transition-colors duration-200 hover:text-orange-400 cursor-pointer">
+                        <span>{chapter.title}</span>
+                        <span className="text-muted-foreground">
+                          {new Date(chapter.createdAt).toLocaleString()}{" "}
+                          {/* Formatting date */}
+                        </span>
+                      </div>
+                    </Link>
+                  ))
+                ) : (
+                  <div>No chapters available</div> // Handle case where parts are empty or undefined
+                )}
               </div>
             </CardContent>
           </Card>

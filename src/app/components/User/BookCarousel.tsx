@@ -7,14 +7,10 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import BookCard from "./BookCard";
-interface Book {
-  imageUrl: string;
-  title: string;
-  altText: string;
-}
+import { StoryType } from "@/types/Story";
 
 interface BookCarouselProps {
-  books: Book[];
+  books: StoryType[];
 }
 
 export function BookCarousel({ books }: BookCarouselProps) {
