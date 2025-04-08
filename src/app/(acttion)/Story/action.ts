@@ -123,6 +123,7 @@ export async function GetStoriesByAuthor(page: number = 1) {
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
+        .populate("parts") // 💡 This populates the parts field
         .lean(),
 
       Story.countDocuments({ author: authorId }),

@@ -21,18 +21,25 @@ import {
   ChevronDown,
   Bold,
   Italic,
-  Underline,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
   Image,
   Video,
   MoreHorizontal,
 } from "lucide-react";
-import { Textarea } from "@/components/ui/textarea";
+import { useParams } from "next/navigation";
+import { getStoryAndPart } from "@/app/(acttion)/StoryPart/action";
+import Link from "next/link";
 
-export default function StoryWriter() {
-  const [title, setTitle] = useState("Untitled Part 1");
+export default function Editor({
+  data,
+  storyId,
+  storyPartId,
+}: {
+  data: any;
+  storyId: string;
+  storyPartId: string;
+}) {
+  const [title, setTitle] = useState(data.part.title);
+  const [storyTitle, setStoryTitle] = useState(data.story.title);
 
   const editor = useEditor({
     extensions: [StarterKit],
@@ -41,18 +48,34 @@ export default function StoryWriter() {
         class: "border rounded-xl p-2 min-h-[300px] border-none outline-none",
       },
     },
-    content: "",
+    content: data.part.content,
   });
-
   return (
     <div className="min-h-screen bg-background text-foreground">
       <nav className="border-b p-4 flex justify-between items-center">
         <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="icon">
-            <ChevronDown className="h-4 w-4" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              asChild
+              className="flex items-center p-4 h-7 border-none outline-none gap-1 w-full text-white sm:w-auto  rounded-md"
+            >
+              <Button>
+                <ChevronDown size={14} />
+              </Button>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent className="w-80 p-2">
+              {data.story.parts?.map((part: any, idx: any) => (
+                <Link key={idx} href={``}>
+                  <DropdownMenuItem className="flex items-center gap-2">
+                    <span>{part.title || `Chapter ${idx + 1}`}</span>
+                  </DropdownMenuItem>
+                </Link>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>{" "}
           <div>
-            <p className="text-sm font-medium">Untitled Story</p>
+            <p className="text-sm font-medium">{storyTitle}</p>
             <h2 className="text-xl font-bold">{title}</h2>
           </div>
         </div>
@@ -66,10 +89,6 @@ export default function StoryWriter() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuItem>Dedication</DropdownMenuItem>
-              <DropdownMenuItem>Time Setting</DropdownMenuItem>
-              <DropdownMenuItem>External Link</DropdownMenuItem>
-              <DropdownMenuItem>Revisions</DropdownMenuItem>
               <DropdownMenuItem className="text-destructive">
                 Delete this part
               </DropdownMenuItem>
@@ -78,16 +97,7 @@ export default function StoryWriter() {
         </div>
       </nav>
 
-      <main className="container mx-auto mt-8 space-y-4">
-        <div className="flex justify-center space-x-4">
-          <Button variant="outline" size="icon">
-            <Image className="h-4 w-4" />
-          </Button>
-          <Button variant="outline" size="icon">
-            <Video className="h-4 w-4" />
-          </Button>
-        </div>
-
+      <main className="container  mx-auto mt-8 space-y-4">
         <Input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -140,7 +150,9 @@ export default function StoryWriter() {
             </p>
             <div className="flex justify-end space-x-2">
               <Button variant="outline">Cancel</Button>
-              <Button>Publish</Button>
+              <form>
+                <Button type="submit">Publish</Button>
+              </form>
             </div>
           </div>
         </PopoverContent>

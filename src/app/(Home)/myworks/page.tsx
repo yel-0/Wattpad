@@ -3,7 +3,8 @@ import Link from "next/link";
 import MyWorkStoryCard from "@/app/components/User/MyWorkStoryCard";
 import { GetStoriesByAuthor } from "@/app/(acttion)/Story/action";
 const MyWork = async () => {
-  const result = await GetStoriesByAuthor(1);
+  const data = await GetStoriesByAuthor(1);
+  const result = JSON.parse(JSON.stringify(data));
   return (
     <div className="min-h-screen  container max-w-2xl p-4 mx-auto">
       <div className="flex flex-row py-4 justify-between items-center">

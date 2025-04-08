@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -6,22 +8,39 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Eye,
-  MessageSquare,
-  Star,
-  Pencil,
-  Trash2,
-  ChevronDown,
-} from "lucide-react";
+import { Eye, MessageSquare, Star, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { StoryType } from "@/types/Story";
 import DeleteStoryDialog from "./DeleteStoryDialog";
+import { createStoryPart } from "@/app/(acttion)/StoryPart/action";
+import { useRouter } from "next/navigation";
 interface MyWorkStoryCardProps {
   story: StoryType;
 }
 
 const MyWorkStoryCard: React.FC<MyWorkStoryCardProps> = ({ story }) => {
+  const router = useRouter();
+
+  const handleCreateStoryPart = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const content = " ";
+    const visibility = "public";
+
+    const result = await createStoryPart({
+      storyId: story._id,
+      title: "Untitled Part",
+      content,
+      visibility,
+    });
+
+    if (result.success) {
+      router.push(`/CreateStoryPart/${story._id}/${result.data?._id}`);
+    } else {
+      console.error("❌ Failed to create story part:", result.error);
+    }
+  };
+
   return (
     <Card className="flex flex-col md:flex-row items-center gap-4 mb-4 p-4 border border-gray-200 shadow-sm">
       {/* Story Image */}
@@ -65,21 +84,31 @@ const MyWorkStoryCard: React.FC<MyWorkStoryCardProps> = ({ story }) => {
         <div className="flex flex-col sm:flex-row sm:gap-2 gap-2 sm:mt-0 mt-4 w-full sm:w-auto">
           <DropdownMenu>
             <DropdownMenuTrigger className="flex items-center p-4 h-7 border-none outline-none gap-1 w-full text-white sm:w-auto bg-orange-500 hover:bg-orange-600 rounded-md">
-              <div className="text-sm">Continue Writing</div>{" "}
+              <div className="text-sm">Continue Writing</div>
               <ChevronDown size={14} />
             </DropdownMenuTrigger>
 
             <DropdownMenuContent className="w-80 p-2">
               {story.parts?.map((part, idx) => (
-                <DropdownMenuItem key={idx} className="flex items-center gap-2">
-                  <span>{part.title || `Chapter ${idx + 1}`}</span>
-                </DropdownMenuItem>
+                <Link
+                  key={idx}
+                  href={`/CreateStoryPart/${story._id}/${part._id}`}
+                >
+                  <DropdownMenuItem className="flex items-center gap-2">
+                    <span>{part.title || `Chapter ${idx + 1}`}</span>
+                  </DropdownMenuItem>
+                </Link>
               ))}
-              <Link href="/CreateStoryPart">
-                <Button className="mt-3 w-full bg-orange-500 hover:bg-orange-600">
+
+              {/* Form submission for creating a story part */}
+              <form onSubmit={handleCreateStoryPart}>
+                <Button
+                  className="mt-3 w-full bg-orange-500 hover:bg-orange-600"
+                  type="submit"
+                >
                   New
                 </Button>
-              </Link>
+              </form>
             </DropdownMenuContent>
           </DropdownMenu>
 
