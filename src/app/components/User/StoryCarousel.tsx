@@ -10,62 +10,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { Clock } from "lucide-react";
 import StoryCard from "./StoryCard";
-interface Story {
-  id: string;
-  imageUrl: string;
-  title: string;
-  description: string;
-  reads: number;
-  isComplete: boolean;
+import { StoryType } from "@/types/Story";
+
+interface StoryCarouselProps {
+  stories: StoryType[];
 }
 
-const stories: Story[] = [
-  {
-    id: "1",
-    imageUrl:
-      "https://images.unsplash.com/photo-1736604860264-e2f21df57a89?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHw2fHx8ZW58MHx8fHx8",
-    title: "Only You",
-    description:
-      "When Charlotte agrees to fake date bad boy Mason to make her best friend and secret crush, Ben, jealous, she thinks it will be a simple arrangement...",
-    reads: 7453507,
-    isComplete: true,
-  },
-  {
-    id: "2",
-    imageUrl:
-      "https://images.unsplash.com/photo-1738071545459-e19435ae37e0?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxMHx8fGVufDB8fHx8fA%3D%3D",
-    title: "Buried Roses",
-    description:
-      "Grace, the illegitimate daughter of Edward IV, finds her life turned upside down when he dies and her family flees into sanctuary when her uncle takes power...",
-    reads: 51423,
-    isComplete: true,
-  },
-  // Add more stories as needed to test carousel functionality
-  {
-    id: "3",
-    imageUrl:
-      "https://images.unsplash.com/photo-1736604860264-e2f21df57a89?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHw2fHx8ZW58MHx8fHx8",
-    title: "Lady Mutiny",
-    description:
-      "Assassin Lilia Cortova was given a simple task: kill a rich lord at a festival. The last thing she expected was to be betrayed by the leader of her own Guild in the process...",
-    reads: 78184,
-    isComplete: true,
-  },
-  {
-    id: "4",
-    imageUrl:
-      "https://images.unsplash.com/photo-1738071545459-e19435ae37e0?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxMHx8fGVufDB8fHx8fA%3D%3D",
-    title: "Love in his Lie",
-    description:
-      "What happens when your casual crush accidentally turns into your fiancé...without you even knowing?",
-    reads: 81329,
-    isComplete: true,
-  },
-];
-
-export function StoryCarousel() {
+export function StoryCarousel({ stories }: StoryCarouselProps) {
   return (
-    <div className="w-full my-10 bg-white">
+    <div className="w-full my-10 bg-white ">
       <div className="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center">
         <div>
           <h4 className="text-sm text-gray-600 mb-1">
@@ -101,15 +54,15 @@ export function StoryCarousel() {
         opts={{
           align: "start",
         }}
-        className="w-full relative"
+        className="w-full h-full relative"
       >
         <CarouselContent>
           {Array.from({ length: Math.ceil(stories.length / 2) }).map(
             (_, index) => (
-              <CarouselItem key={index} className="pt-1 ">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <CarouselItem key={index} className="pt-1 p-3 h-[300px] ">
+                <div className="grid h-full  grid-cols-1 md:grid-cols-2 gap-4">
                   {stories.slice(index * 2, index * 2 + 2).map((story) => (
-                    <StoryCard key={story.id} {...story} />
+                    <StoryCard key={story._id} story={story} />
                   ))}
                 </div>
               </CarouselItem>

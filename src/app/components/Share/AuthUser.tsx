@@ -59,7 +59,7 @@ const AuthUser = () => {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <Link href={"/Profile"}>
+              <Link href={`/Profile/${session.user.name}`}>
                 <DropdownMenuItem>
                   <User className="mr-2 h-4 w-4" />
                   <span>Profile</span>

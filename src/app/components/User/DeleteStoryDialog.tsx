@@ -28,7 +28,7 @@ const DeleteStoryDialog = ({ storyId }: DeleteStoryDialogProps) => {
       try {
         const result = await DeleteStoryById(storyId);
         if (result.success) {
-          alert("Story deleted successfully.");
+          alert(result.message);
         } else {
           setError(result.message || "Something went wrong.");
         }

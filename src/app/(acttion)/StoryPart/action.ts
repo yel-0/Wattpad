@@ -170,6 +170,7 @@ export async function updateStoryPart({
     };
   }
 }
+
 interface StoryWithPartResponse {
   story: {
     _id: string;
@@ -180,6 +181,10 @@ interface StoryWithPartResponse {
       _id: string;
       title: string;
     }>;
+    author: {
+      name: string;
+      email: string;
+    };
   };
   part: {
     _id: string;
@@ -196,25 +201,36 @@ type MinimalPart = {
   title: string;
 };
 
+// Assuming you have a User model with name and email fields
+interface IUser extends mongoose.Document {
+  _id: mongoose.Types.ObjectId;
+  name: string;
+  email: string;
+}
+
 export async function getStoryAndPart(
   storyId: string,
   partId: string
 ): Promise<StoryWithPartResponse | null> {
   try {
-    await connectToDatabase();
+    await connectToDatabase(); // Ensure this connects to your MongoDB
 
     const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
-      // 1. Fetch the story with minimal part details
+      // Fetch the story with the author populated and parts populated
       const story = await Story.findById(storyId)
-        .select("title description coverImage")
-        .session(session)
+        .select("title description coverImage author") // Select only the needed fields
         .populate<{ parts: MinimalPart[] }>({
-          path: "parts",
-          select: "_id title",
+          path: "parts", // Populate parts
+          select: "_id title", // Select only minimal fields
         })
+        .populate<{ author: IUser }>({
+          path: "author", // Populate the author field, ensuring it's populated as a full User
+          select: "name email", // Select only name and email for the author
+        })
+        .session(session)
         .lean();
 
       if (!story) {
@@ -223,7 +239,7 @@ export async function getStoryAndPart(
         return null;
       }
 
-      // 2. Verify the part exists in this story
+      // Verify the part exists in this story
       const partExistsInStory = await Story.exists({
         _id: storyId,
         parts: partId,
@@ -235,7 +251,7 @@ export async function getStoryAndPart(
         return null;
       }
 
-      // 3. Fetch the full part details
+      // Fetch the full part details
       const part = await StoryPart.findById(partId)
         .select("title content visibility createdAt")
         .session(session)
@@ -247,10 +263,11 @@ export async function getStoryAndPart(
         return null;
       }
 
+      // Commit transaction and end session
       await session.commitTransaction();
       session.endSession();
 
-      // Convert all ObjectIds to strings
+      // Return the story and part details, converting ObjectIds to strings
       return {
         story: {
           _id: story._id.toString(),
@@ -261,6 +278,10 @@ export async function getStoryAndPart(
             _id: p._id.toString(),
             title: p.title,
           })),
+          author: {
+            name: story.author.name,
+            email: story.author.email,
+          },
         },
         part: {
           _id: part._id.toString(),
@@ -273,10 +294,11 @@ export async function getStoryAndPart(
     } catch (error) {
       await session.abortTransaction();
       session.endSession();
+      console.error("Error fetching story and part:", error);
       throw error;
     }
   } catch (error) {
-    console.error("Error fetching story and part:", error);
+    console.error("Error connecting to the database:", error);
     throw new Error("Failed to fetch story and part");
   }
 }

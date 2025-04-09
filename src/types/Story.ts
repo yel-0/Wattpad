@@ -7,7 +7,10 @@ export interface StoryType {
     _id: any;
     title: string;
   }[];
-
+  author?: {
+    name: string;
+    email: string;
+  };
   __v?: any;
   createdAt?: string;
   updatedAt?: string;

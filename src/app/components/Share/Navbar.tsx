@@ -29,7 +29,7 @@ import AuthUser from "./AuthUser";
 import { SessionProvider } from "next-auth/react";
 import { useSession } from "next-auth/react";
 import AuthUserMobile from "./AuthUserMobile";
-
+import { useRouter } from "next/navigation";
 interface MenuItem {
   title: string;
   url: string;
@@ -146,6 +146,20 @@ const Navbar = ({
     signup: { text: "Sign up", url: "/register" },
   },
 }: Navbar1Props) => {
+  const router = useRouter();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault(); // Prevent the default form submission
+    const searchValue = (e.target as HTMLFormElement).elements.namedItem(
+      "search"
+    ) as HTMLInputElement;
+    const query = searchValue?.value.trim(); // Get the search query value
+
+    if (query) {
+      // Navigate to /Search/queryValue
+      router.push(`/Search/${query}`);
+    }
+  };
   return (
     <SessionProvider>
       <section className="py-4  flex flex-row border-b justify-center items-center ">
@@ -163,14 +177,19 @@ const Navbar = ({
                   </NavigationMenuList>
                 </NavigationMenu>
                 <div className="relative ml-3 max-w-xs mx-auto">
-                  <Input
-                    placeholder="Search..."
-                    className="w-full py-2 pl-3 pr-10 border rounded-lg"
-                  />
-                  <Search
-                    size={16}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-                  />
+                  <form onSubmit={handleSubmit} className="relative">
+                    <Input
+                      name="search" // Add name attribute to input
+                      placeholder="Search..."
+                      className="w-full py-2 pl-3 pr-10 border rounded-lg"
+                    />
+                    <button
+                      type="submit"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                    >
+                      <Search size={16} />
+                    </button>
+                  </form>
                 </div>
               </div>
             </div>

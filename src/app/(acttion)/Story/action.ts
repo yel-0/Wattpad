@@ -334,30 +334,33 @@ export async function searchByStoryTitle(
 
 export async function FetchStoriesByCategoryName(
   page: number = 1,
-  categoryName: string
+  categoryName?: string,
+  limit: number = 10 // Default value for limit
 ) {
   try {
-    const limit = 10;
     const skip = (page - 1) * limit;
 
     await connectToDatabase();
 
+    const filter: any = categoryName ? { category: categoryName } : {};
+
     const [stories, totalCount] = await Promise.all([
-      Story.find({ category: categoryName }) // Filter by category name
+      Story.find(filter)
         .sort({ createdAt: -1 })
-        .select("_id title visibility coverImage createdAt updatedAt language") // Only the fields you need
+        .select(
+          "_id title visibility description coverImage createdAt updatedAt language"
+        )
         .skip(skip)
         .limit(limit)
         .lean(),
-
-      Story.countDocuments({ category: categoryName }), // Count the total stories for the category
+      Story.countDocuments(filter),
     ]);
 
     const totalPages = Math.ceil(totalCount / limit);
 
     return {
       success: true,
-      stories: stories || [], // Ensure an empty array if undefined,
+      stories: stories || [],
       pagination: {
         page,
         totalPages,
@@ -422,6 +425,7 @@ async function getCloudinaryResource(url: string) {
 // Function to delete the story and its cover image
 export async function DeleteStoryById(storyId: string) {
   const session = await getServerSession(authOptions);
+
   if (!session || !session.user?.id) {
     return { success: false, message: "Unauthorized" };
   }
@@ -429,7 +433,7 @@ export async function DeleteStoryById(storyId: string) {
   try {
     await connectToDatabase();
 
-    // Fetch the story first
+    // Fetch the story
     const story = await Story.findOne({
       _id: storyId,
       author: session.user.id,
@@ -439,16 +443,14 @@ export async function DeleteStoryById(storyId: string) {
       return { success: false, message: "Story not found or unauthorized." };
     }
 
-    // If there's a cover image, delete it from Cloudinary
+    // Delete cover image from Cloudinary if exists
     if (story.coverImage) {
-      const publicId = await getCloudinaryResource(story.coverImage); // Get public ID from Cloudinary
+      const publicId = await getCloudinaryResource(story.coverImage);
 
       if (publicId) {
         const destroyResult = await cloudinary.uploader.destroy(publicId);
-        console.log("Cloudinary destroy result:", destroyResult); // Log result
 
         if (!destroyResult.result || destroyResult.result !== "ok") {
-          console.error("Cloudinary image deletion failed:", destroyResult);
           return {
             success: false,
             message: "Failed to delete the image from Cloudinary.",
@@ -457,10 +459,16 @@ export async function DeleteStoryById(storyId: string) {
       }
     }
 
-    // Delete the story from MongoDB
+    // Delete the story
     await Story.deleteOne({ _id: storyId });
 
-    return { success: true, message: "Story and image deleted successfully." };
+    // Delete all related parts of the story
+    await StoryPart.deleteMany({ storyId });
+
+    return {
+      success: true,
+      message: "Story and its parts deleted successfully.",
+    };
   } catch (error) {
     console.error("Delete story error:", error);
     return { success: false, message: "An error occurred." };

@@ -34,7 +34,7 @@ export default async function StoryDetailPage({
                 src={story?.coverImage || "/default-image.jpg"}
                 width={240}
                 height={360}
-                className="w-full h-full object-cover"
+                className="max-h-[360px] object-cover"
               />
             </div>
             <div className="space-y-4">

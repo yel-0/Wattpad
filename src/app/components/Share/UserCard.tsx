@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { BookOpen, List, Users } from "lucide-react";
+import Link from "next/link";
 
 interface UserProps {
   user: {
@@ -24,7 +25,9 @@ const UserCard: React.FC<UserProps> = ({ user }) => {
 
       {/* User Info */}
       <div className="flex-1">
-        <h2 className="text-lg font-semibold">{user.name}</h2>
+        <Link href={`/Profile/${user.name}`}>
+          <h2 className="text-lg font-semibold">{user.name}</h2>
+        </Link>
         <p className="text-sm text-gray-500">{user.email}</p>
 
         {/* Stats */}

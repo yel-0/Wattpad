@@ -10,7 +10,7 @@ const AuthUserMobile = () => {
       <div className="flex gap-4 flex-col justify-center items-center">
         <p>Welcome, {session.user.name}</p>
         <Button className="w-full" asChild>
-          <a href="/profile">Go to Profile</a>
+          <a href={`/Profile/${session.user.name}`}>Go to Profile</a>
         </Button>
         <Button
           variant={"destructive"}

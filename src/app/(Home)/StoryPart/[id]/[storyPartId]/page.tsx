@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ChapterSelect } from "@/app/components/Share/ChapterSelect";
 import { getStoryAndPart } from "@/app/(acttion)/StoryPart/action";
 import DisplayData from "@/app/components/User/DisplayData";
+import Link from "next/link";
 
 export default async function StoryReader({
   params,
@@ -65,7 +66,9 @@ export default async function StoryReader({
               <AvatarFallback>HI</AvatarFallback>
             </Avatar>
             <div>
-              <div className="font-medium">by HonorInTheRain</div>
+              <Link href={`/Profile/${data?.story.author.name}`}>
+                <div className="font-medium">by {data?.story.author.name}</div>
+              </Link>{" "}
               <Button variant="ghost" size="sm" className="text-blue-600">
                 Follow
               </Button>

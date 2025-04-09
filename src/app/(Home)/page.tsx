@@ -85,15 +85,18 @@ const stories = [
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
-  const { stories } = await FetchStoriesByCategoryName(1, "action");
+  const { stories } = await FetchStoriesByCategoryName(1, "");
   const { stories: Adventure } = await FetchStoriesByCategoryName(
     1,
     "adventure"
   );
+  const { stories: editorPick } = await FetchStoriesByCategoryName(1, "", 4);
 
   const actionStories = JSON.parse(JSON.stringify(stories));
 
   const adv = JSON.parse(JSON.stringify(Adventure));
+
+  const editor = JSON.parse(JSON.stringify(editorPick));
 
   return (
     <main className="container mx-auto px-4 md:px-10 lg:px-20 mt-5">
@@ -109,17 +112,9 @@ export default async function Home() {
       <div className="text-lg sm:text-xl font-semibold text-black">
         Love at first sentence 📖💘
       </div>
-      <BookCarousel books={adv} />
+      <BookCarousel books={actionStories} />
 
-      {/* <StoryCarousel />
-
-      <div className="text-sm mt-6  text-black opacity-75">
-        Fall head over heels
-      </div>
-      <div className="text-lg sm:text-xl font-semibold text-black">
-        Love at first sentence 📖💘
-      </div>
-      <BookCarousel books={books} />
+      <StoryCarousel stories={editor} />
 
       <div className="text-sm mt-6  text-black opacity-75">
         Fall head over heels
@@ -127,7 +122,17 @@ export default async function Home() {
       <div className="text-lg sm:text-xl font-semibold text-black">
         Love at first sentence 📖💘
       </div>
-      <BookCarousel books={books} /> */}
+      <BookCarousel books={actionStories} />
+      <StoryCarousel stories={editor} />
+
+      <div className="text-sm mt-6  text-black opacity-75">
+        Fall head over heels
+      </div>
+
+      <div className="text-lg sm:text-xl font-semibold text-black">
+        Love at first sentence 📖💘
+      </div>
+      <BookCarousel books={actionStories} />
     </main>
   );
 }

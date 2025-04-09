@@ -28,3 +28,30 @@ export async function registerUser(formData: FormData) {
     return { success: false, message: "Something went wrong." };
   }
 }
+
+export async function searchUsersByName(name: string, limit: number = 10) {
+  if (!name || name.trim() === "") {
+    return { success: false, message: "Name is required." };
+  }
+
+  try {
+    await connectToDatabase();
+
+    const users = await User.find({
+      name: { $regex: new RegExp(name, "i") }, // case-insensitive search
+    })
+      .limit(limit)
+      .lean();
+
+    return {
+      success: true,
+      users,
+    };
+  } catch (error) {
+    console.error("Error searching users by name:", error);
+    return {
+      success: false,
+      message: "Something went wrong while searching for users.",
+    };
+  }
+}

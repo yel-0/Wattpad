@@ -55,7 +55,7 @@ const MyWorkStoryCard: React.FC<MyWorkStoryCardProps> = ({ story }) => {
       {/* Story Info */}
       <CardContent className="flex flex-col md:flex-1 justify-between md:flex-row gap-4 md:gap-2 w-full p-0">
         <div className="flex flex-col gap-2">
-          <h3 className="text-lg font-semibold">
+          <h3 className="text-lg max-w-[150px] font-semibold">
             <Link
               href={`/myworks/UpdateStory/${story._id}`}
               className="hover:underline"
