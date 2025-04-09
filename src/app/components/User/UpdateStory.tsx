@@ -12,59 +12,41 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Upload } from "lucide-react";
-import { CreateStory } from "@/app/(acttion)/Story/action";
+import { UpdateStory } from "@/app/(acttion)/Story/action";
 
-export default function StoryEditor() {
-  const [title, setTitle] = useState<string>("Untitled Story");
-  const [description, setDescription] = useState<string>("");
-  const [category, setCategory] = useState<string>("");
-  const [language, setLanguage] = useState<string>("English");
-  const [copyright, setCopyright] = useState<string>("1");
-  const [coverImage, setCoverImage] = useState<string>("");
-  const [imgFile, setImgFile] = useState<File | null>(null);
-  const [visibility, setVisibility] = useState<"public" | "private">("public");
+export default function PageClient({ story }: { story: any }) {
+  const [title, setTitle] = useState<string>(story.title || "Untitled Story");
+  const [description, setDescription] = useState<string>(
+    story.description || ""
+  );
+  const [category, setCategory] = useState<string>(story.category || "");
+  const [language, setLanguage] = useState<string>(story.language || "English");
+  const [copyright, setCopyright] = useState<string>(
+    story.copyright.toString() || "1"
+  );
+  const [coverImage, setCoverImage] = useState<string>(story.coverImage || "");
+  const [visibility, setVisibility] = useState<"public" | "private">(
+    story.visibility || "public"
+  );
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-
-    if (!file) {
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setCoverImage(reader.result as string);
-      setImgFile(file); // actual file to upload
-    };
-
-    reader.onerror = (error) => console.error("Error reading file:", error);
-
-    reader.readAsDataURL(file);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleUpdateStory = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const formData = new FormData();
-
+    formData.append("storyId", story._id);
     formData.append("title", title);
     formData.append("description", description);
     formData.append("category", category);
     formData.append("language", language);
     formData.append("copyright", copyright);
-    formData.append("visibility", visibility); // Include visibility
+    formData.append("visibility", visibility);
 
-    if (imgFile) {
-      formData.append("coverImage", imgFile); // Pass the file directly here
-    }
-
-    // Send the formData to the server-side handler
-    const response = await CreateStory(formData);
-    // console.log(response);
+    const result = await UpdateStory(formData);
+    alert(result.message);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="container mx-auto px-4 py-8">
+    <form onSubmit={handleUpdateStory} className="container mx-auto px-4 py-8">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-3">
           <div className="relative aspect-[3/4] bg-muted rounded-lg overflow-hidden">
@@ -86,7 +68,7 @@ export default function StoryEditor() {
                     type="file"
                     name="image"
                     className="hidden"
-                    onChange={handleImageUpload}
+                    // onChange={handleImageUpload}
                     required
                   />
                 </label>
@@ -128,7 +110,7 @@ export default function StoryEditor() {
 
               <div className="space-y-2">
                 <label className="text-sm font-medium">Category</label>
-                <Select onValueChange={setCategory}>
+                <Select value={category} onValueChange={setCategory}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
@@ -143,7 +125,7 @@ export default function StoryEditor() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Language</label>
-                  <Select onValueChange={setLanguage} defaultValue={language}>
+                  <Select onValueChange={setLanguage} value={language}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -157,7 +139,7 @@ export default function StoryEditor() {
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Copyright</label>
-                  <Select onValueChange={setCopyright} defaultValue={copyright}>
+                  <Select onValueChange={setCopyright} value={copyright}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>

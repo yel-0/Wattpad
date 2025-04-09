@@ -56,16 +56,19 @@ const MyWorkStoryCard: React.FC<MyWorkStoryCardProps> = ({ story }) => {
       <CardContent className="flex flex-col md:flex-1 justify-between md:flex-row gap-4 md:gap-2 w-full p-0">
         <div className="flex flex-col gap-2">
           <h3 className="text-lg font-semibold">
-            <Link href={`/myworks/${story._id}`} className="hover:underline">
+            <Link
+              href={`/myworks/UpdateStory/${story._id}`}
+              className="hover:underline"
+            >
               {story.title || "Untitled Story"}
             </Link>
           </h3>
           <div className="text-sm text-gray-500">
             {story.parts?.length || 0} Draft
           </div>
-          <div className="text-xs text-gray-400">
+          {/* <div className="text-xs text-gray-400">
             Updated {new Date(story.updatedAt).toLocaleString()}
-          </div>
+          </div> */}
 
           <div className="flex items-center gap-3 text-xs text-gray-500">
             <div className="flex items-center gap-1">

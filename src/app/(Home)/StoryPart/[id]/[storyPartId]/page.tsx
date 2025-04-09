@@ -19,7 +19,10 @@ export default async function StoryReader({
     <div className="min-h-screen bg-white">
       <div className="relative px-4 border-b flex items-center justify-between gap-4 w-full">
         {/* Chapter Select */}
-        <ChapterSelect chapters={data?.story.parts || []} />
+        <ChapterSelect
+          chapters={data?.story?.parts || []}
+          story={data?.story}
+        />
         {/* Buttons + Vote with Star Icon */}
         <div className="flex gap-4">
           <Button variant="outline" className="px-4 py-2">
@@ -34,7 +37,9 @@ export default async function StoryReader({
 
       {/* Chapter Content */}
       <div className="container mx-auto px-4 py-8">
-        <h2 className="text-3xl font-bold text-center mb-6">Chapter 3.</h2>
+        <h2 className="text-3xl font-bold text-center mb-6">
+          {data?.part.title}
+        </h2>
 
         <div className="flex items-center justify-center gap-8 mb-8 text-sm text-gray-600">
           <div className="flex items-center gap-2">

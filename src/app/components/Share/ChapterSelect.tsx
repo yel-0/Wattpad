@@ -18,36 +18,35 @@ interface Chapter {
   createdAt?: string;
 }
 
+import { StoryType } from "@/types/Story";
+
 interface ChapterSelectProps {
   chapters: Chapter[]; // Array of chapters
+  story?: StoryType; // The entire story object
 }
 
-export function ChapterSelect({ chapters }: ChapterSelectProps) {
+export function ChapterSelect({ chapters, story }: ChapterSelectProps) {
   const [currentChapter, setCurrentChapter] = useState<Chapter | undefined>(
     undefined
   );
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="flex items-center gap-2 p-3 bg-white border rounded-md shadow-sm hover:bg-gray-50">
+      <DropdownMenuTrigger className="flex p-3 w-[300px] items-center gap-2  bg-white border rounded-md shadow-sm hover:bg-gray-50">
         <img
-          src="https://img.wattpad.com/cover/765329-64-k688944.jpg"
+          src={story?.coverImage}
           alt="Book cover"
           className="w-8 h-10 object-cover rounded"
         />
-        <div className="text-left">
-          <h2 className="text-sm font-semibold">
-            In 27 Days (Watty Award Winner 2012)
-          </h2>
+        <div className="text-left w-full">
+          <h2 className="text-sm font-semibold">{story?.title}</h2>
           <p className="text-xs text-gray-500">by HonorInTheRain</p>
         </div>
         <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-80">
         <div className="p-2 text-center border-b">
-          <h6 className="font-semibold">
-            In 27 Days (Watty Award Winner 2012)
-          </h6>
+          <h6 className="font-semibold">{story?.title}</h6>
           <small className="text-gray-500">Table of contents</small>
         </div>
         <ScrollArea className="h-72">

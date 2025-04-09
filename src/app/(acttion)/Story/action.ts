@@ -6,6 +6,7 @@ import { getServerSession } from "next-auth";
 import { v2 as cloudinary } from "cloudinary";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import mongoose from "mongoose";
+import StoryPart from "@/models/StoryPart";
 
 // Configure Cloudinary
 cloudinary.config({
@@ -101,6 +102,62 @@ export async function CreateStory(formData: FormData) {
     return {
       success: false,
       message: "Something went wrong. Please try again.",
+    };
+  }
+}
+
+export async function UpdateStory(formData: FormData) {
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user?.id) {
+    return { success: false, message: "Unauthorized" };
+  }
+
+  const author = session.user.id;
+
+  // Extract fields from the form
+  const storyId = formData.get("storyId") as string;
+  const title = formData.get("title") as string;
+  const description = formData.get("description") as string;
+  const category = formData.get("category") as string;
+  const language = formData.get("language") as string;
+  const visibility = formData.get("visibility") as "public" | "private";
+  const copyright = parseInt(formData.get("copyright") as string, 10) as
+    | 1
+    | 2
+    | 3;
+  try {
+    await connectToDatabase();
+
+    const existingStory = await Story.findById(storyId);
+
+    if (!existingStory) {
+      return { success: false, message: "Story not found" };
+    }
+
+    // Only allow update if user is the author
+    if (existingStory.author.toString() !== author) {
+      return { success: false, message: "Permission denied" };
+    }
+
+    // Update fields
+    existingStory.title = title;
+    existingStory.description = description;
+    existingStory.category = category;
+    existingStory.language = language;
+    existingStory.visibility = visibility;
+    existingStory.copyright = copyright;
+
+    await existingStory.save();
+
+    return {
+      success: true,
+      message: "Story updated successfully",
+    };
+  } catch (error) {
+    console.error("Error updating story:", error);
+    return {
+      success: false,
+      message: "Failed to update story. Please try again later.",
     };
   }
 }
@@ -290,16 +347,16 @@ export async function DeleteStoryById(storyId: string) {
 export async function FetchStoryById(storyId: string) {
   try {
     // Ensure the storyId is a valid ObjectId
-    const objectId = new mongoose.Types.ObjectId(storyId);
 
     await connectToDatabase();
 
     // Fetch the story by its ID and populate the 'parts' field
-    const story = await Story.findById(objectId)
-      .populate("parts") // Populating the 'parts' field with full details
+    const story = await Story.findById(storyId)
       .select(
         "_id title visibility views likes description coverImage createdAt updatedAt language parts"
-      ) // Select only the necessary fields
+      )
+      .populate("parts") // Populating the 'parts' field with full details
+
       .lean();
 
     if (!story) {
@@ -312,6 +369,35 @@ export async function FetchStoryById(storyId: string) {
     return {
       success: true,
       story, // Return the fetched story
+    };
+  } catch (error) {
+    console.error("Error fetching story by ID:", error);
+    return {
+      success: false,
+      message: "Failed to fetch story by ID",
+    };
+  }
+}
+
+export async function FetchStoryByIdWithoutParts(storyId: string) {
+  try {
+    // Ensure the storyId is a valid ObjectId
+
+    await connectToDatabase();
+
+    // Fetch the story by its ID and populate the 'parts' field
+    const story = await Story.findById(storyId).lean();
+
+    if (!story) {
+      return {
+        success: false,
+        message: "Story not found",
+      };
+    }
+
+    return {
+      success: true,
+      story,
     };
   } catch (error) {
     console.error("Error fetching story by ID:", error);
