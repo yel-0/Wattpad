@@ -7,6 +7,7 @@ import { v2 as cloudinary } from "cloudinary";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import mongoose from "mongoose";
 import StoryPart from "@/models/StoryPart";
+import User from "@/models/User";
 
 // Configure Cloudinary
 cloudinary.config({
@@ -181,7 +182,7 @@ export async function GetStoriesByAuthor(page: number = 1) {
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
-        .populate("parts") // 💡 This populates the parts field
+        .populate("parts")
         .lean(),
 
       Story.countDocuments({ author: authorId }),
@@ -205,6 +206,128 @@ export async function GetStoriesByAuthor(page: number = 1) {
     return {
       success: false,
       message: "Failed to fetch stories",
+    };
+  }
+}
+
+export async function searchByAuthorName(authorName: string, page: number = 1) {
+  try {
+    // Ensure valid author name is provided
+    if (!authorName) {
+      return { success: false, message: "Author name is required" };
+    }
+
+    // Search for user by author name (case-insensitive)
+    const user = await User.findOne({
+      name: { $regex: new RegExp(authorName, "i") },
+    }).lean();
+
+    if (!user) {
+      return { success: false, message: "Author not found" };
+    }
+
+    const authorId = user._id;
+    const limit = 10;
+    const skip = (page - 1) * limit;
+
+    await connectToDatabase();
+
+    const [stories, totalCount] = await Promise.all([
+      Story.find({ author: authorId })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(), // No population of parts, just get the stories
+      Story.countDocuments({ author: authorId }),
+    ]);
+
+    const totalPages = Math.ceil(totalCount / limit);
+
+    return {
+      success: true,
+      stories,
+      pagination: {
+        page,
+        totalPages,
+        totalCount,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching stories by author name:", error);
+    return {
+      success: false,
+      message: "Failed to fetch stories by author name",
+    };
+  }
+}
+
+export async function searchByStoryTitle(
+  title: string,
+  page: number = 1,
+  filters: { partsLength?: number; createdAt?: string; category?: string } = {}
+) {
+  try {
+    // Ensure valid title is provided
+    if (!title) {
+      return { success: false, message: "Story title is required" };
+    }
+
+    // Initialize filters
+    let filterQuery: any = {
+      title: { $regex: new RegExp(title, "i") },
+    };
+
+    // Apply parts length filter if provided
+    if (filters.partsLength) {
+      filterQuery["parts"] = { $size: filters.partsLength };
+    }
+
+    // Apply createdAt filter if provided
+    if (filters.createdAt) {
+      const dateRange = new Date(filters.createdAt);
+      filterQuery["createdAt"] = { $gte: dateRange }; // Filter stories created after the given date
+    }
+
+    // Apply category filter if provided
+    if (filters.category) {
+      filterQuery["category"] = filters.category;
+    }
+
+    // Connect to the database
+    await connectToDatabase();
+
+    const limit = 10;
+    const skip = (page - 1) * limit;
+
+    const [stories, totalCount] = await Promise.all([
+      Story.find(filterQuery)
+        .sort({ createdAt: -1 }) // Sorting by most recent stories
+        .skip(skip)
+        .limit(limit)
+        .lean(), // No population for parts, just get the stories
+      Story.countDocuments(filterQuery),
+    ]);
+
+    const totalPages = Math.ceil(totalCount / limit);
+
+    return {
+      success: true,
+      stories,
+      pagination: {
+        page,
+        totalPages,
+        totalCount,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching stories by title:", error);
+    return {
+      success: false,
+      message: "Failed to fetch stories by title",
     };
   }
 }

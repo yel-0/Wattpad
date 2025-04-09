@@ -61,6 +61,7 @@ export default function StoryEditor() {
     // Send the formData to the server-side handler
     const response = await CreateStory(formData);
     // console.log(response);
+    alert(response.message);
   };
 
   return (
@@ -97,13 +98,8 @@ export default function StoryEditor() {
 
         <div className="lg:col-span-8 lg:col-start-5">
           <div className="space-y-8">
-            <div>
-              <Button
-                variant="ghost"
-                className="w-full justify-start text-lg font-semibold px-0"
-              >
-                Story Details
-              </Button>
+            <div className="w-full justify-start text-lg font-semibold px-0">
+              Story Details
             </div>
             <div className="space-y-6">
               <div className="space-y-2">
@@ -136,6 +132,23 @@ export default function StoryEditor() {
                     <SelectItem value="action">Action</SelectItem>
                     <SelectItem value="adventure">Adventure</SelectItem>
                     <SelectItem value="chickLit">ChickLit</SelectItem>
+                    <SelectItem value="romance">Romance</SelectItem>
+                    <SelectItem value="fantasy">Fantasy</SelectItem>
+                    <SelectItem value="mystery">Mystery</SelectItem>
+                    <SelectItem value="scienceFiction">
+                      Science Fiction
+                    </SelectItem>
+                    <SelectItem value="horror">Horror</SelectItem>
+                    <SelectItem value="thriller">Thriller</SelectItem>
+                    <SelectItem value="drama">Drama</SelectItem>
+                    <SelectItem value="youngAdult">Young Adult</SelectItem>
+                    <SelectItem value="historicalFiction">
+                      Historical Fiction
+                    </SelectItem>
+                    <SelectItem value="fanfiction">Fanfiction</SelectItem>
+                    <SelectItem value="poetry">Poetry</SelectItem>
+                    <SelectItem value="sliceOfLife">Slice of Life</SelectItem>
+                    <SelectItem value="humor">Humor</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

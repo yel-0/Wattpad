@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import Link from "next/link";
 
 interface Chapter {
   _id: string;
@@ -23,9 +24,10 @@ import { StoryType } from "@/types/Story";
 interface ChapterSelectProps {
   chapters: Chapter[]; // Array of chapters
   story?: StoryType; // The entire story object
+  view: string;
 }
 
-export function ChapterSelect({ chapters, story }: ChapterSelectProps) {
+export function ChapterSelect({ chapters, story, view }: ChapterSelectProps) {
   const [currentChapter, setCurrentChapter] = useState<Chapter | undefined>(
     undefined
   );
@@ -50,17 +52,37 @@ export function ChapterSelect({ chapters, story }: ChapterSelectProps) {
           <small className="text-gray-500">Table of contents</small>
         </div>
         <ScrollArea className="h-72">
-          {chapters.map((chapter: Chapter) => (
-            <DropdownMenuItem
-              key={chapter._id} // Use unique identifier (_id) as the key
-              onSelect={() => setCurrentChapter(chapter)}
-              className={`flex items-center ${
-                currentChapter?._id === chapter._id ? "bg-orange-100" : ""
-              }`}
-            >
-              <div className="text-sm">{chapter.title}</div>
-            </DropdownMenuItem>
-          ))}
+          {chapters.map((chapter: Chapter) =>
+            view === "create" ? (
+              <Link
+                href={`/CreateStoryPart/${story?._id}/${chapter._id}`}
+                key={chapter._id}
+              >
+                <DropdownMenuItem
+                  onSelect={() => setCurrentChapter(chapter)}
+                  className={`flex items-center ${
+                    currentChapter?._id === chapter._id ? "bg-orange-100" : ""
+                  }`}
+                >
+                  <div className="text-sm">{chapter.title}</div>
+                </DropdownMenuItem>
+              </Link>
+            ) : (
+              <Link
+                href={`/StoryPart/${story?._id}/${chapter._id}`}
+                key={chapter._id}
+              >
+                <DropdownMenuItem
+                  onSelect={() => setCurrentChapter(chapter)}
+                  className={`flex items-center ${
+                    currentChapter?._id === chapter._id ? "bg-orange-100" : ""
+                  }`}
+                >
+                  <div className="text-sm">{chapter.title}</div>
+                </DropdownMenuItem>
+              </Link>
+            )
+          )}
         </ScrollArea>
       </DropdownMenuContent>
     </DropdownMenu>

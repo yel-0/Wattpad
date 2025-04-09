@@ -1,10 +1,10 @@
 import { Checkbox } from "@/components/ui/checkbox";
 
-export function SearchFilters() {
+export function SearchFilters({ title }: { title: string }) {
   return (
     <div className="w-64 p-4">
       <div className="mb-6">
-        <h3 className="mb-2 text-lg font-semibold">"my hero"</h3>
+        <h3 className="mb-2 text-lg font-semibold">"{title}"</h3>
         <p className="text-sm text-gray-500">231K results</p>
       </div>
 

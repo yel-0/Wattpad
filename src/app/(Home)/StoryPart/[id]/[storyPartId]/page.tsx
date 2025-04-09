@@ -22,6 +22,7 @@ export default async function StoryReader({
         <ChapterSelect
           chapters={data?.story?.parts || []}
           story={data?.story}
+          view="view"
         />
         {/* Buttons + Vote with Star Icon */}
         <div className="flex gap-4">
@@ -80,8 +81,10 @@ export default async function StoryReader({
           </div>
 
           {/* Story Text */}
-          <div className="prose max-w-none  text-gray-800 leading-relaxed">
-            <DisplayData content={data?.part.content} />
+          <div className="prose max-w-none text-gray-800 leading-relaxed">
+            {typeof data?.part.content !== "string" && (
+              <DisplayData content={data?.part.content} />
+            )}
           </div>
         </div>
       </div>

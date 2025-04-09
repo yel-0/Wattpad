@@ -66,6 +66,54 @@ export async function createStoryPart({
     };
   }
 }
+
+export async function deleteStoryPart(storyPartId: string) {
+  try {
+    await connectToDatabase();
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      // 1. Find the story part to get its parent story ID
+      const part = await StoryPart.findById(storyPartId).session(session);
+      if (!part) {
+        throw new Error("Story part not found.");
+      }
+
+      const storyId = part.story;
+
+      // 2. Delete the story part
+      await StoryPart.findByIdAndDelete(storyPartId).session(session);
+
+      // 3. Pull the part reference from the story
+      await Story.findByIdAndUpdate(
+        storyId,
+        { $pull: { parts: storyPartId } },
+        { new: true, session }
+      );
+
+      await session.commitTransaction();
+      session.endSession();
+
+      return {
+        success: true,
+        message: "Story part deleted successfully.",
+      };
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
+    }
+  } catch (error) {
+    console.error("Error deleting story part:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Failed to delete story part.",
+    };
+  }
+}
 interface UpdateStoryPartParams {
   storyPartId: string;
   title: string;

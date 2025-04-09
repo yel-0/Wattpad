@@ -32,6 +32,8 @@ import {
 } from "@/app/(acttion)/StoryPart/action";
 import Link from "next/link";
 import router from "next/router";
+import { ChapterSelect } from "../Share/ChapterSelect";
+import DeleteStoryPartDialog from "./DeleteStoryPartDialog";
 
 export default function Editor({
   data,
@@ -82,33 +84,11 @@ export default function Editor({
     <div className="min-h-screen bg-background text-foreground">
       <nav className="border-b p-4 flex justify-between items-center">
         <div className="flex items-center space-x-4">
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              asChild
-              className="flex items-center p-4 h-7 border-none outline-none gap-1 w-full text-white sm:w-auto  rounded-md"
-            >
-              <Button>
-                <ChevronDown size={14} />
-              </Button>
-            </DropdownMenuTrigger>
-
-            <DropdownMenuContent className="w-80 p-2">
-              {data.story.parts?.map((part: any, idx: any) => (
-                <Link
-                  key={idx}
-                  href={`/CreateStoryPart/${storyId}/${part._id}`}
-                >
-                  <DropdownMenuItem className="flex items-center gap-2">
-                    <span>{part.title || `Chapter ${idx + 1}`}</span>
-                  </DropdownMenuItem>
-                </Link>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>{" "}
-          <div>
-            <p className="text-sm font-medium">{storyTitle}</p>
-            <h2 className="text-xl font-bold">{title}</h2>
-          </div>
+          <ChapterSelect
+            chapters={data?.story?.parts || []}
+            story={data?.story}
+            view="create"
+          />
         </div>
         <div className="flex items-center space-x-2">
           <Button>Save</Button>
@@ -120,9 +100,7 @@ export default function Editor({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuItem className="text-destructive">
-                Delete this part
-              </DropdownMenuItem>
+              <DeleteStoryPartDialog storyPartId={storyPartId} />
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
