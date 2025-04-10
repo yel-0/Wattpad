@@ -6,32 +6,44 @@ import Link from "next/link";
 import EditProfileButton from "@/app/components/User/EditProfileButton";
 import { searchByAuthorName } from "@/app/(acttion)/Story/action";
 import { SearchStoryCard } from "@/app/components/Share/SearchStoryCard";
-
-const UserProfile = async ({ params }: { params: { username: string } }) => {
+import { getUserByUsername } from "@/app/(acttion)/User/User";
+const UserProfile = async ({
+  params,
+}: {
+  params: Promise<{ username: string }>;
+}) => {
   // Fetching user data on the server
-  const userData = await getUserData(params.username);
 
-  const { stories } = await searchByAuthorName(params.username);
+  const username = (await params).username;
+  const { user } = await getUserByUsername(username);
+
+  const { stories } = await searchByAuthorName(username);
+
+  // Default fallback images
+  const DEFAULT_PROFILE_IMAGE =
+    "https://plus.unsplash.com/premium_photo-1671934974148-82228b911598?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fHVucGx1Z2dlZHxlbnwwfHwwfHx8MA%3D%3D";
+  const DEFAULT_BACKGROUND_IMAGE =
+    "https://images.unsplash.com/reserve/NFuTknHQTsOc0uHAA4E4_4968226460_33fb941a16_o.jpg?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fHVucGx1Z2dlZHxlbnwwfHwwfHx8MA%3D%3D";
 
   // Function to get user data
-  async function getUserData(username: string) {
-    // Replace this with your actual API call or data fetching logic
-    // For example, you can use the searchByAuthorName function or a DB query
-    return {
-      username: "John Doe",
-      email: "john.doe@example.com",
-      profileImage:
-        "https://images.unsplash.com/photo-1739325755246-0000aca42302?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHw4fHx8ZW58MHx8fHx8",
-      backgroundImage: "/bg.jpg",
-    };
+
+  if (!user) {
+    return <div>User not found.</div>;
   }
+
+  const userResult = JSON.parse(JSON.stringify(user));
+
+  // Set fallback images if user doesn't have them
+  const profileImage = user.profileImage || DEFAULT_PROFILE_IMAGE;
+  const bgImage = user.bgImage || DEFAULT_BACKGROUND_IMAGE;
+  // console.log(user);
 
   return (
     <div>
       <div
         className="flex justify-center items-center h-[400px] p-6"
         style={{
-          backgroundImage: `url(${userData.backgroundImage})`,
+          backgroundImage: `url(${bgImage})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
@@ -39,12 +51,16 @@ const UserProfile = async ({ params }: { params: { username: string } }) => {
         <div className="w-full max-w-md border-none text-white p-6">
           <div className="flex flex-col items-center">
             <Avatar className="w-24 h-24 mb-4 border-4 border-white">
-              <AvatarImage src={userData.profileImage} alt="User Image" />
-              <AvatarFallback>{userData.username.charAt(0)}</AvatarFallback>
+              <AvatarImage
+                className="object-cover"
+                src={profileImage}
+                alt="User Image"
+              />
+              <AvatarFallback>{user.userName}</AvatarFallback>
             </Avatar>
-            <h2 className="text-xl font-semibold">{userData.username}</h2>
+            <h2 className="text-xl font-semibold">{user.userName}</h2>
             <p className="flex items-center gap-2">
-              <Mail size={16} /> {userData.email}
+              <Mail size={16} /> {user.email}
             </p>
           </div>
           <div className="mt-6 flex justify-between text-center">
@@ -69,13 +85,13 @@ const UserProfile = async ({ params }: { params: { username: string } }) => {
           <Link href={"#"}>Conversation</Link>
           <Link href={"#"}>Following</Link>
         </div>
-        <EditProfileButton userData={userData} />
+        <EditProfileButton userData={userResult} />
       </div>
 
       <div className="min-h-screen">
         <div className="container mx-auto flex flex-col justify-center items-center">
           <div className="flex flex-row px-4 py-2 w-[650px] justify-between items-center">
-            <div>Stories By {userData.username}</div>
+            <div>Stories By {user.name}</div>
             <Button>
               <Settings />
             </Button>
