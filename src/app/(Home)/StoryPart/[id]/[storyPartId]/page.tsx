@@ -22,7 +22,7 @@ export default async function StoryReader({
         {/* Chapter Select */}
         <ChapterSelect
           chapters={data?.story?.parts || []}
-          story={data?.story}
+          story={JSON.parse(JSON.stringify(data?.story))}
           view="view"
         />
         {/* Buttons + Vote with Star Icon */}
@@ -62,7 +62,7 @@ export default async function StoryReader({
           {/* Author Info */}
           <div className="flex items-center gap-4 mb-8">
             <Avatar>
-              <AvatarImage src="https://images.unsplash.com/photo-1738683987582-b52d371d2782?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwxMnx8fGVufDB8fHx8fA%3D%3D" />
+              <AvatarImage src={data?.story.author.profileImage} />
               <AvatarFallback>HI</AvatarFallback>
             </Avatar>
             <div>

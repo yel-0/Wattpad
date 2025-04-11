@@ -7,12 +7,15 @@ import EditProfileButton from "@/app/components/User/EditProfileButton";
 import { searchByAuthorName } from "@/app/(acttion)/Story/action";
 import { SearchStoryCard } from "@/app/components/Share/SearchStoryCard";
 import { getUserByUsername } from "@/app/(acttion)/User/User";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 const UserProfile = async ({
   params,
 }: {
   params: Promise<{ username: string }>;
 }) => {
   // Fetching user data on the server
+  const session = await getServerSession(authOptions);
 
   const username = (await params).username;
   const { user } = await getUserByUsername(username);
@@ -85,7 +88,11 @@ const UserProfile = async ({
           <Link href={"#"}>Conversation</Link>
           <Link href={"#"}>Following</Link>
         </div>
-        <EditProfileButton userData={userResult} />
+        {session?.user.name === username ? (
+          <EditProfileButton userData={userResult} />
+        ) : (
+          <Button>Follow +</Button>
+        )}
       </div>
 
       <div className="min-h-screen">

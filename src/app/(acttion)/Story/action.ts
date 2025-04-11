@@ -332,6 +332,48 @@ export async function searchByStoryTitle(
   }
 }
 
+export async function searchByCategoryName(category: string, page: number = 1) {
+  try {
+    if (!category) {
+      return { success: false, message: "Category is required" };
+    }
+
+    await connectToDatabase();
+
+    const limit = 10;
+    const skip = (page - 1) * limit;
+
+    const [stories, totalCount] = await Promise.all([
+      Story.find({ category })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      Story.countDocuments({ category }),
+    ]);
+
+    const totalPages = Math.ceil(totalCount / limit);
+
+    return {
+      success: true,
+      stories,
+      pagination: {
+        page,
+        totalPages,
+        totalCount,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching stories by category:", error);
+    return {
+      success: false,
+      message: "Failed to fetch stories by category",
+    };
+  }
+}
+
 export async function FetchStoriesByCategoryName(
   page: number = 1,
   categoryName?: string,
@@ -484,10 +526,15 @@ export async function FetchStoryById(storyId: string) {
     // Fetch the story by its ID and populate the 'parts' field
     const story = await Story.findById(storyId)
       .select(
-        "_id title visibility views likes description coverImage createdAt updatedAt language parts"
+        "_id title visibility author views likes description coverImage createdAt updatedAt language parts"
       )
-      .populate("parts") // Populating the 'parts' field with full details
-
+      .populate({
+        path: "parts",
+      })
+      .populate({
+        path: "author",
+        select: "-_id -password", // Exclude _id and password
+      })
       .lean();
 
     if (!story) {

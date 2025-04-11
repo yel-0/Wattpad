@@ -15,9 +15,11 @@ export default async function Page({
 
   const data = await getStoryAndPart(storyId, storyPartId);
 
+  const d = JSON.parse(JSON.stringify(data));
+
   return (
     <div>
-      <Editor data={data} storyId={storyId} storyPartId={storyPartId} />
+      <Editor data={d} storyId={storyId} storyPartId={storyPartId} />
     </div>
   );
 }

@@ -6,4 +6,7 @@ export interface User {
   isAdmin: boolean;
   createdAt: string;
   updatedAt: string;
+  profileImage: string;
+  bgImage: string;
+  userName: string;
 }

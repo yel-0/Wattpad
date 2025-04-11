@@ -1,3 +1,5 @@
+import { User } from "./User";
+
 export interface StoryType {
   _id: string;
   title: string;
@@ -7,10 +9,7 @@ export interface StoryType {
     _id: any;
     title: string;
   }[];
-  author?: {
-    name: string;
-    email: string;
-  };
+  author?: User;
   __v?: any;
   createdAt?: string;
   updatedAt?: string;

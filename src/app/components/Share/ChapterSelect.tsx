@@ -19,12 +19,11 @@ interface Chapter {
   visibility?: string;
   createdAt?: string;
 }
-
-import { StoryType } from "@/types/Story";
+import { StoryData } from "@/types/StoryAndPartsWithAuthor";
 
 interface ChapterSelectProps {
   chapters: Chapter[];
-  story?: StoryType;
+  story?: StoryData;
   view: string;
 }
 

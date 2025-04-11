@@ -3,6 +3,8 @@
 import { connectToDatabase } from "@/lib/mongodb";
 import Story from "@/models/Story";
 import StoryPart from "@/models/StoryPart";
+import { StoryAuthor } from "@/types/StoryAndPartsWithAuthor";
+import { User } from "@/types/User";
 import { JSONContent } from "@tiptap/react";
 import mongoose from "mongoose";
 
@@ -171,134 +173,67 @@ export async function updateStoryPart({
   }
 }
 
-interface StoryWithPartResponse {
-  story: {
-    _id: string;
-    title: string;
-    description: string;
-    coverImage?: string;
-    parts: Array<{
-      _id: string;
+export async function getStoryAndPart(storyId: string, partId: string) {
+  try {
+    await connectToDatabase();
+
+    // Fetch story with populated parts and author
+    const story = await Story.findById(storyId)
+      .select("title description coverImage author parts")
+      .populate({
+        path: "parts",
+        select: "_id title",
+      })
+      .populate("author", "name email profileImage bgImage") // 👈 this is key!
+      .lean();
+
+    if (!story) {
+      return null;
+    }
+
+    // Type assertion for parts array
+    const parts = story.parts as unknown as Array<{
+      _id: mongoose.Types.ObjectId;
       title: string;
     }>;
-    author: {
-      name: string;
-      email: string;
-    };
-  };
-  part: {
-    _id: string;
-    title: string;
-    content: string;
-    visibility: string;
-    createdAt: string;
-  };
-}
 
-// Define a type for the minimal part information
-type MinimalPart = {
-  _id: mongoose.Types.ObjectId;
-  title: string;
-};
-
-// Assuming you have a User model with name and email fields
-interface IUser extends mongoose.Document {
-  _id: mongoose.Types.ObjectId;
-  name: string;
-  email: string;
-}
-
-export async function getStoryAndPart(
-  storyId: string,
-  partId: string
-): Promise<StoryWithPartResponse | null> {
-  try {
-    await connectToDatabase(); // Ensure this connects to your MongoDB
-
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
-    try {
-      // Fetch the story with the author populated and parts populated
-      const story = await Story.findById(storyId)
-        .select("title description coverImage author") // Select only the needed fields
-        .populate<{ parts: MinimalPart[] }>({
-          path: "parts", // Populate parts
-          select: "_id title", // Select only minimal fields
-        })
-        .populate<{ author: IUser }>({
-          path: "author", // Populate the author field, ensuring it's populated as a full User
-          select: "name email", // Select only name and email for the author
-        })
-        .session(session)
-        .lean();
-
-      if (!story) {
-        await session.abortTransaction();
-        session.endSession();
-        return null;
-      }
-
-      // Verify the part exists in this story
-      const partExistsInStory = await Story.exists({
-        _id: storyId,
-        parts: partId,
-      }).session(session);
-
-      if (!partExistsInStory) {
-        await session.abortTransaction();
-        session.endSession();
-        return null;
-      }
-
-      // Fetch the full part details
-      const part = await StoryPart.findById(partId)
-        .select("title content visibility createdAt")
-        .session(session)
-        .lean();
-
-      if (!part) {
-        await session.abortTransaction();
-        session.endSession();
-        return null;
-      }
-
-      // Commit transaction and end session
-      await session.commitTransaction();
-      session.endSession();
-
-      // Return the story and part details, converting ObjectIds to strings
-      return {
-        story: {
-          _id: story._id.toString(),
-          title: story.title,
-          description: story.description,
-          coverImage: story.coverImage,
-          parts: story.parts.map((p) => ({
-            _id: p._id.toString(),
-            title: p.title,
-          })),
-          author: {
-            name: story.author.name,
-            email: story.author.email,
-          },
-        },
-        part: {
-          _id: part._id.toString(),
-          title: part.title,
-          content: part.content,
-          visibility: part.visibility,
-          createdAt: part.createdAt.toISOString(),
-        },
-      };
-    } catch (error) {
-      await session.abortTransaction();
-      session.endSession();
-      console.error("Error fetching story and part:", error);
-      throw error;
+    // Check if part exists in story
+    const partExists = parts.some((part) => part._id.toString() === partId);
+    if (!partExists) {
+      return null;
     }
+
+    // Fetch the part details
+    const part = await StoryPart.findById(partId)
+      .select("title content visibility createdAt")
+      .lean();
+
+    if (!part) {
+      return null;
+    }
+
+    return {
+      story: {
+        _id: story._id.toString(),
+        title: story.title,
+        description: story.description,
+        coverImage: story.coverImage,
+        parts: parts.map((p) => ({
+          _id: p._id.toString(),
+          title: p.title,
+        })),
+        author: story.author as unknown as StoryAuthor,
+      },
+      part: {
+        _id: part._id.toString(),
+        title: part.title,
+        content: part.content,
+        visibility: part.visibility,
+        createdAt: part.createdAt.toISOString(),
+      },
+    };
   } catch (error) {
-    console.error("Error connecting to the database:", error);
+    console.error("Error fetching story and part:", error);
     throw new Error("Failed to fetch story and part");
   }
 }
